@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: notGoogleUser()
+        required: true
     },
     isManager: {
         type: Boolean,
@@ -22,7 +22,8 @@ const userSchema = new mongoose.Schema({
         type: String
     },
     language: {
-        type: String
+        type: String,
+        default: 'en'
     }
 })
 
