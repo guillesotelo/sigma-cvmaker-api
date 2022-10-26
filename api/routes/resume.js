@@ -21,6 +21,7 @@ router.get('/', async (req, res, next) => {
 
 router.get('/myResume', async (req, res, next) => {
     try {
+        const { email } = req.query
         const resume = Resume.findOne({ email }).exec()
         if (!resume) return res.status(401).json({ message: 'Email not found' })
 
@@ -61,6 +62,9 @@ router.post('/update', async (req, res, next) => {
 router.post('/remove', async (req, res, next) => {
     try {
         const { _id } = req.body
+        const exists = await Resume.findOne({ _id }).exec()
+        if (!exists) return res.status(404).send('Error deleting resume')
+
         const removed = await Resume.deleteOne({ _id })
         if (!removed) return res.status(404).send('Error deleting resume')
 

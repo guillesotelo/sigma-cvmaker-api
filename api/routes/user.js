@@ -32,11 +32,59 @@ router.post('/', async (req, res, next) => {
 //Create user
 router.post('/create', async (req, res, next) => {
     try {
-        const emailRegistered = await User.findOne({ email: req.body.email }).exec()
+        const { username, email, password, manager, isManager } = req.body
+
+        const emailRegistered = await User.findOne({ email }).exec()
         if (emailRegistered) return res.status(401).send('Email already in use')
 
         const user = await User.create(req.body)
         if (!user) return res.status(400).send('Bad request')
+
+        await transporter.sendMail({
+            from: `"Sigma Resume" <${process.env.EMAIL}>`,
+            to: email,
+            subject: `Welcome to Sigma CV!`,
+            html: `<div style='display: flex; flex-direction: column; align-items: center; margin-top: 3vw; text-align: center;'>
+                        <h2>Hello, ${username.split(' ')[0]}!</h2>
+                        <h3>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
+                        <div style="margin:3vw; width:fit-content; padding:1vw 1.5vw; align-self:center; text-align:left; border-radius:8px;box-shadow: 2px 2px 15px lightgray;">
+                            <h3>Name: ${username}</h3>
+                            <h3>Email: ${email}</h3>
+                            <h3>Password: ${password}</h3>
+                        </div>
+                        <h3>${manager ? `If you have any questions you can ask your manager (${manager})` : ''}</h3>
+                        <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 4vw; align-self: center;' alt="sigma-logo" border="0"/>
+                        <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
+                    </div>`
+        }).catch((err) => {
+            console.error('Something went wrong!', err)
+            res.send(500).send('Server Error')
+        })
+
+        if (manager) {
+            await transporter.sendMail({
+                from: `"Sigma Resume" <${process.env.EMAIL}>`,
+                to: manager,
+                subject: `A new user has been created`,
+                html: `<div style='display: flex; flex-direction: column; align-items: center; margin-top: 3vw; text-align: center;'>
+                            <h2>Hello!</h2>
+                            <h3>A new user has been created with you as the manager.</h3>
+                            <div style="margin:3vw; width:fit-content; padding:1vw 1.5vw; align-self:center; text-align:left; border-radius:8px;box-shadow: 2px 2px 15px lightgray;">
+                                <h4>User details:</h4>
+                                <h3>Name: ${username}</h3>
+                                <h3>Email: ${email}</h3>
+                                <h3>Password: ${password}</h3>
+                                <h3>Manager: ${manager}</h3>
+                                <h3>Is Manager: ${isManager ? 'Yes' : 'No'}</h3>
+                            </div>
+                            <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 4vw; align-self: center;' alt="sigma-logo" border="0"/>
+                            <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
+                        </div>`
+            }).catch((err) => {
+                console.error('Something went wrong!', err)
+                res.send(500).send('Server Error')
+            })
+        }
 
         res.status(201).send(`User created successfully`)
     } catch (err) {
@@ -80,8 +128,8 @@ router.post('/update', async (req, res, next) => {
                         :
                         `<h4>If it wasn't you, please <a href='${REACT_APP_URL}/login'>login</a> with your new email: ${newEmail}, or reply to this email with your registered email and username explaining the issue. We will be responding as soon as possible.</h4>`
                     }
-                                <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 50px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
-                                <a href='REACT_APP_URL/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
+                                <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
+                                <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
                             </div>`
             }).catch((err) => {
                 console.error('Something went wrong!', err)
@@ -127,7 +175,7 @@ router.post('/changePass', async (req, res, next) => {
                             <h2>Hello, ${userData.username}!</h2>
                             <h3>Your password has been changed.</h3>
                             <h4>If it wasn't you, please <a href='${REACT_APP_URL}/changePass?userEmail=${userEmail}'>re-generate it</a> to a new one right away, or reply to this email with your registered email and username.</h4>
-                            <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 50px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
+                            <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
                             <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>CtrlShift App</h5></a>
                         </div>`
         }).catch((err) => console.error('Something went wrong!', err))
@@ -153,7 +201,7 @@ router.post('/resetByEmail', async (req, res, next) => {
             html: `<div style='margin-top: 3vw; text-align: center;'>
                         <h2>Hello, ${user.username}!</h2>
                         <h3>Click <a href='${REACT_APP_URL}/changePass?userEmail=${encrypt(email)}'>here</a> to reset your password.</h3>
-                        <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 50px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
+                        <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
                         <h5 style='margin: 4px;'>CtrlShift Team</h5>
                     </div>`
         }).catch((err) => console.error('Something went wrong!', err))
