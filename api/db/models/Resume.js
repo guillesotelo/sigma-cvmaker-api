@@ -5,7 +5,7 @@ const resumeSchema = new mongoose.Schema({
         type: Date,
         default: new Date()
     },
-    user: {
+    username: {
         type: String
     },
     email: {
@@ -15,6 +15,9 @@ const resumeSchema = new mongoose.Schema({
         type: String
     },
     manager: {
+        type: String
+    },
+    role: {
         type: String
     }
 })

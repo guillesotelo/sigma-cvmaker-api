@@ -4,11 +4,12 @@ const { Resume } = require('../db/models')
 const { encrypt, decrypt } = require('../helpers')
 
 //Get all resumes by Manager
-router.get('/', async (req, res, next) => {
+router.get('/getAll', async (req, res, next) => {
     try {
-        const { username } = req.query
-        if (username) {
-            const resumes = await Resume.find({ manager: username }).sort([['date', 'descending']])
+        const { email } = req.query
+        console.log("req.query", req.query)
+        if (email) {
+            const resumes = await Resume.find({ manager: email }).sort([['date', 'descending']])
             if (!resumes) return res.status(404).send('No resumes found.')
 
             res.status(200).json(resumes)
@@ -21,7 +22,7 @@ router.get('/', async (req, res, next) => {
 
 router.get('/myResume', async (req, res, next) => {
     try {
-        const { email } = req.query
+        const { email } = req.body
         const resume = Resume.findOne({ email }).exec()
         if (!resume) return res.status(401).json({ message: 'Email not found' })
 
@@ -33,7 +34,7 @@ router.get('/myResume', async (req, res, next) => {
 })
 
 //Create new resume
-router.post('/', async (req, res, next) => {
+router.post('/create', async (req, res, next) => {
     try {
         const newResume = await Resume.create(req.body)
         res.status(200).json({ newResume })

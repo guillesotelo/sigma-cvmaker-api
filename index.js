@@ -12,8 +12,13 @@ app.use(cors({
   methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
 }))
 app.use(morgan("dev"))
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+
+// app.use(express.json())
+// app.use(express.urlencoded({ extended: true }))
+
+app.use(express.json({limit: '200mb'}));
+app.use(express.urlencoded({limit: '200mb', extended: true}));
+
 app.use("/api", routes)
 
 app.use((err, _, res, __) => {

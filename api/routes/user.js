@@ -19,7 +19,9 @@ router.post('/', async (req, res, next) => {
         res.status(200).json({
             username: user.username,
             email: user.email,
+            manager: user.manager,
             isManager: user.isManager,
+            picture: user.picture || null,
             language: user.language || null
         })
 
