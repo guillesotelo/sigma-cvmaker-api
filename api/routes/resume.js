@@ -6,9 +6,15 @@ const { encrypt, decrypt } = require('../helpers')
 //Get all resumes by Manager
 router.get('/getAll', async (req, res, next) => {
     try {
-        const { email } = req.query
+        const { email, getAll } = req.query
 
-        if (email) {
+        if (getAll) {
+            const resumes = await Resume.find().sort([['date', 'descending']])
+            if (!resumes) return res.status(404).send('No resumes found.')
+
+            return res.status(200).json(resumes)
+        }
+        else if (email) {
             const resumes = await Resume.find({ manager: email }).sort([['date', 'descending']])
             if (!resumes) return res.status(404).send('No resumes found.')
 
