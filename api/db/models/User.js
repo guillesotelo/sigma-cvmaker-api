@@ -38,8 +38,6 @@ userSchema.pre('save', function (next) {
             else {
                 bcrypt.hash(user.password, salt, function (hashError, hash) {
                     if (hashError) return next(hashError)
-                    console.log("password not hashed", user.passowrd)
-                    console.log("password hashed", hash)
                     user.password = hash
                     next()
                 })
