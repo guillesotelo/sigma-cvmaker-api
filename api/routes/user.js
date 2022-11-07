@@ -46,18 +46,24 @@ router.post('/create', async (req, res, next) => {
             from: `"Sigma Resume" <${process.env.EMAIL}>`,
             to: email,
             subject: `Welcome to Sigma CV!`,
-            html: `<div style='display: flex; flex-direction: column; align-items: center; margin: 3vw auto; text-align: center;'>
-                        <h2>Hello, ${username.split(' ')[0]}!</h2>
-                        <h3>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
-                        <div style="margin: 3vw auto; width:fit-content; padding:1vw 1.5vw; align-self:center; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;">
-                            <h3>Name: ${username}</h3>
-                            <h3>Email: ${email}</h3>
-                            <h3>Password: ${password}</h3>
-                        </div>
-                        <h3>${manager ? `If you have any questions you can ask your manager (${manager})` : ''}</h3>
-                        <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 4vw; align-self: center;' alt="sigma-logo" border="0"/>
-                        <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
-                    </div>`
+            html: `<table>
+                        <tbody>
+                            <tr>
+                                <td style='align-items: center; margin: 3vw auto; text-align: center;'>
+                                    <h2>Hello, ${username.split(' ')[0]}!</h2>
+                                    <h3>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
+                                    <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
+                                        <h3>Name: ${username}</h3>
+                                        <h3>Email: ${email}</h3>
+                                        <h3>Password: ${password}</h3>
+                                    </div>
+                                    <h3>${manager ? `If you have any questions you can ask your manager (${manager})` : ''}</h3>
+                                    <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 4vw; align-self: center;' alt="sigma-logo" border="0"/>
+                                    <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>`
         }).catch((err) => {
             console.error('Something went wrong!', err)
             res.send(500).send('Server Error')
@@ -68,20 +74,26 @@ router.post('/create', async (req, res, next) => {
                 from: `"Sigma Resume" <${process.env.EMAIL}>`,
                 to: manager,
                 subject: `A new user has been created`,
-                html: `<div style='display: flex; flex-direction: column; align-items: center; margin: 3vw auto;; text-align: center;'>
-                            <h2>Hello!</h2>
-                            <h3>A new user has been created with you as the manager.</h3>
-                            <div style="margin: 3vw auto;; width:fit-content; padding:1vw 1.5vw; align-self:center; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;">
-                                <h4>User details:</h4>
-                                <h3>Name: ${username}</h3>
-                                <h3>Email: ${email}</h3>
-                                <h3>Password: ${password}</h3>
-                                <h3>Manager: ${manager}</h3>
-                                <h3>Is Manager: ${isManager ? 'Yes' : 'No'}</h3>
-                            </div>
-                            <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 4vw; align-self: center;' alt="sigma-logo" border="0"/>
-                            <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
-                        </div>`
+                html: `<table>
+                            <tbody>
+                                <tr>
+                                    <td style='align-items: center; margin: 3vw auto; text-align: center;'>
+                                        <h2>Hello!</h2>
+                                        <h3>A new user has been created with you as the manager.</h3>
+                                        <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
+                                            <h4>User details:</h4>
+                                            <h3>Name: ${username}</h3>
+                                            <h3>Email: ${email}</h3>
+                                            <h3>Password: ${password}</h3>
+                                            <h3>Manager: ${manager}</h3>
+                                            <h3>Is Manager: ${isManager ? 'Yes' : 'No'}</h3>
+                                        </div>
+                                        <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 4vw; align-self: center;' alt="sigma-logo" border="0"/>
+                                        <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>`
             }).catch((err) => {
                 console.error('Something went wrong!', err)
                 res.send(500).send('Server Error')
