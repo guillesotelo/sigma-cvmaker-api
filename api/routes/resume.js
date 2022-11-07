@@ -27,22 +27,28 @@ router.get('/getAll', async (req, res, next) => {
     }
 })
 
-router.get('/migrateImages', async (req, res, next) => {
-    try {
-        const resumes = await Resume.find().sort([['date', 'descending']])
-        if(resumes && resumes.data) {
-            resumes.data.forEach(async resume => {
-                const { profilePic } = resume.data && JSON.parse(resume.data)
-                const image = await Image.create({ resumeId: resume._id, data: profilePic && JSON.stringify(profilePic.profileImage) })
-            })
-        }
+//Migration of profile images to new DB (One use only)
+// router.get('/migrateImages', async (req, res, next) => {
+//     try {
+//         const resumes = await Resume.find()
+//         if (resumes) {
+//             resumes.forEach(async (resume, i) => {
+//                 const newData = JSON.parse(resume.data)
 
-        return res.status(200).json('Migrated successfully')
-    } catch (err) {
-        console.error('Something went wrong!', err)
-        res.send(500).send('Server Error')
-    }
-})
+//                 delete newData.profilePic
+//                 delete newData.signature
+
+//                 const saved = await Resume.findOneAndUpdate({ _id: resume._id }, { data: JSON.stringify(newData) }, { returnDocument: "after", useFindAndModify: false })
+//                 console.log(`saved ${i}`, saved)
+//             })
+//         }
+
+//         return res.status(200).json('Migrated successfully')
+//     } catch (err) {
+//         console.error('Something went wrong!', err)
+//         res.send(500).send('Server Error')
+//     }
+// })
 
 
 router.get('/myResume', async (req, res, next) => {
@@ -91,10 +97,9 @@ router.post('/create', async (req, res, next) => {
 //Get Profile Image by Resume ID
 router.get('/getProfileImage', async (req, res, next) => {
     try {
-        const { _id } = req.body
-
+        const { _id } = req.query
         const profileImage = await Image.findOne({ resumeId: _id }).exec()
-        res.status(200).json({ profileImage })
+        res.status(200).json(profileImage)
 
     } catch (err) {
         console.error('Something went wrong!', err)
