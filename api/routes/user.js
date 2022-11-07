@@ -46,10 +46,10 @@ router.post('/create', async (req, res, next) => {
             from: `"Sigma Resume" <${process.env.EMAIL}>`,
             to: email,
             subject: `Welcome to Sigma CV!`,
-            html: `<div style='display: flex; flex-direction: column; align-items: center; margin-top: 3vw; text-align: center;'>
+            html: `<div style='display: flex; flex-direction: column; align-items: center; margin: 3vw auto; text-align: center;'>
                         <h2>Hello, ${username.split(' ')[0]}!</h2>
                         <h3>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
-                        <div style="margin:3vw; width:fit-content; padding:1vw 1.5vw; align-self:center; text-align:left; border-radius:8px;box-shadow: 2px 2px 15px lightgray;">
+                        <div style="margin: 3vw auto; width:fit-content; padding:1vw 1.5vw; align-self:center; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;">
                             <h3>Name: ${username}</h3>
                             <h3>Email: ${email}</h3>
                             <h3>Password: ${password}</h3>
@@ -68,10 +68,10 @@ router.post('/create', async (req, res, next) => {
                 from: `"Sigma Resume" <${process.env.EMAIL}>`,
                 to: manager,
                 subject: `A new user has been created`,
-                html: `<div style='display: flex; flex-direction: column; align-items: center; margin-top: 3vw; text-align: center;'>
+                html: `<div style='display: flex; flex-direction: column; align-items: center; margin: 3vw auto;; text-align: center;'>
                             <h2>Hello!</h2>
                             <h3>A new user has been created with you as the manager.</h3>
-                            <div style="margin:3vw; width:fit-content; padding:1vw 1.5vw; align-self:center; text-align:left; border-radius:8px;box-shadow: 2px 2px 15px lightgray;">
+                            <div style="margin: 3vw auto;; width:fit-content; padding:1vw 1.5vw; align-self:center; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;">
                                 <h4>User details:</h4>
                                 <h3>Name: ${username}</h3>
                                 <h3>Email: ${email}</h3>
