@@ -110,10 +110,15 @@ router.get('/getProfileImage', async (req, res, next) => {
 //Update resume by ID
 router.post('/update', async (req, res, next) => {
     try {
-        const { _id } = req.body
+        const { _id, profilePic } = req.body
 
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating resume')
+
+        if (profilePic) {
+            await Image.deleteOne({ resumeId: _id })
+            await Image.create({ resumeId: _id, data: profilePic })
+        }
 
         res.status(200).json({ message: 'Resume updated successfully' })
     } catch (err) {
