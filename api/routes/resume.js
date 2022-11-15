@@ -142,8 +142,7 @@ router.get('/getProfileImage', async (req, res, next) => {
 router.post('/update', async (req, res, next) => {
     try {
         const { _id, profilePic } = req.body
-        console.log("_id", _id)
-        console.log("profilePic", profilePic)
+        
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating resume')
 

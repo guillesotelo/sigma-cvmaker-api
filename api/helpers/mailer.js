@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
   });
 
 transporter.verify().then(() => {
-    console.log("Mailing ready!")
+  console.log("* Mailing ready *")
 })
 
 module.exports = transporter;
