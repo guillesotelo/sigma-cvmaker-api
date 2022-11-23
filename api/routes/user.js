@@ -31,7 +31,7 @@ router.post('/', async (req, res, next) => {
     }
 })
 
-//Create user
+//Create new user / register
 router.post('/create', async (req, res, next) => {
     try {
         const { username, email, password, manager, isManager } = req.body
@@ -164,6 +164,7 @@ router.post('/update', async (req, res, next) => {
     }
 })
 
+//Change user password
 router.post('/changePass', async (req, res, next) => {
     try {
         const { userEmail, password, currentPass } = req.body
@@ -202,6 +203,7 @@ router.post('/changePass', async (req, res, next) => {
     }
 })
 
+//Send Email to reset password
 router.post('/resetByEmail', async (req, res, next) => {
     try {
         const { email } = req.body
@@ -221,6 +223,24 @@ router.post('/resetByEmail', async (req, res, next) => {
         }).catch((err) => console.error('Something went wrong!', err))
 
         res.status(200).json({})
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
+//Check if it's admin user
+router.get('/admin', async (req, res, next) => {
+    try {
+        const { email } = req.query
+
+        const user = await User.findOne({ email }).exec()
+        if (!user) return res.status(401).send('Email not found')
+
+        res.status(200).json({
+            isAdmin: user.isAdmin || false
+        })
+
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')
