@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { Report, User } = require('../db/models')
+const { ReportModel, User } = require('../db/models')
 const transporter = require('../helpers/mailer')
 
 //Get all reports
@@ -10,7 +10,7 @@ router.get('/getAll', async (req, res, next) => {
         const { isAdmin } = await User.findOne({ email }).exec()
 
         if (isAdmin) {
-            const reports = await Report.find().sort([['date', 'descending']])
+            const reports = await ReportModel.find().sort([['date', 'descending']])
             if (!reports) return res.status(404).send('No reports found.')
 
             res.status(200).json(reports)
@@ -24,7 +24,7 @@ router.get('/getAll', async (req, res, next) => {
 //Create new report
 router.post('/create', async (req, res, next) => {
     try {
-        const newReport = await Report.create(req.body)
+        const newReport = await ReportModel.create(req.body)
         if (!newReport) return res.status(400).json('Error creating report')
 
         res.status(200).json(newReport)
@@ -40,7 +40,7 @@ router.post('/update', async (req, res, next) => {
         const { _id } = req.body
         let reportData = { ...req.body }
 
-        const updated = await Report.findByIdAndUpdate(_id, reportData, { returnDocument: "after", useFindAndModify: false })
+        const updated = await ReportModel.findByIdAndUpdate(_id, reportData, { returnDocument: "after", useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating Report.')
 
         res.status(200).json(updated)

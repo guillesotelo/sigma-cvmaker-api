@@ -1,11 +1,11 @@
 const User = require("./User");
 const Resume = require("./Resume");
 const Image = require("./Image");
-const Report = require("./Report");
+const ReportModel = require("./ReportModel");
 
 module.exports = {
   User,
   Resume,
   Image,
-  Report
+  ReportModel
 };
