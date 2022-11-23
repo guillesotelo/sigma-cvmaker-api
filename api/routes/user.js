@@ -110,53 +110,20 @@ router.post('/create', async (req, res, next) => {
 //Update User Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { email, username, currentPass, newEmail, newName } = req.body
-        let passwordChanged = false
-
-        if (currentPass) {
-            const user = await User.findOne({ email }).exec()
-            if (!user) return res.status(401).json({})
-
-            const compareRes = await user.comparePassword(currentPass)
-            if (!compareRes) return res.status(401).send('Invalid credentials')
-            passwordChanged = true
-        }
-
-        const newData = req.body
-        if (newName) newData.username = newName
+        const { email, newData } = req.body
 
         const newUser = await User.findOneAndUpdate(
-            { username, email }, newData, { returnDocument: "after", useFindAndModify: false })
+            { email }, newData, { returnDocument: "after", useFindAndModify: false })
         if (!newUser) return res.status(404).send('Error updating User.')
 
-        if (passwordChanged || newEmail) {
-            await transporter.sendMail({
-                from: `"Sigma Resume" <${process.env.EMAIL}>`,
-                to: email,
-                subject: `Your ${passwordChanged ? 'password' : 'email'} has been changed`,
-                html: `<div style='margin-top: 3vw; text-align: center;'>
-                                <h2>Hello, ${username}!</h2>
-                                <h3>Your ${passwordChanged ? 'password' : 'email'} has been changed.</h3>
-                                ${passwordChanged ?
-                        `<h4>If it wasn't you, please <a href='${REACT_APP_URL}/changePass?userEmail=${encrypt(email)}'>re-generate it</a> to a new one right away, or reply to this email with your registered email and username explaining the issue. We will be responding as soon as possible.</h4>`
-                        :
-                        `<h4>If it wasn't you, please <a href='${REACT_APP_URL}/login'>login</a> with your new email: ${newEmail}, or reply to this email with your registered email and username explaining the issue. We will be responding as soon as possible.</h4>`
-                    }
-                                <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
-                                <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma Resume App</h5></a>
-                            </div>`
-            }).catch((err) => {
-                console.error('Something went wrong!', err)
-                res.send(500).send('Server Error')
-            })
-        }
 
         res.status(200).json({
-            id: newUser.id,
-            email: newUser.email,
             username: newUser.username,
+            email: newUser.email,
+            manager: newUser.manager,
             isManager: newUser.isManager,
-            language: newUser.language
+            picture: newUser.picture || null,
+            language: newUser.language || null
         })
     } catch (err) {
         console.error('Something went wrong!', err)
