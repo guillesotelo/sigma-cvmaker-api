@@ -6,7 +6,7 @@ const { encrypt, decrypt } = require('../helpers')
 const { REACT_APP_URL } = process.env
 
 //User Login
-router.post('/', async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
     try {
         const { email, password } = req.body
 
