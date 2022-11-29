@@ -2,9 +2,6 @@ const { ObjectId } = require('mongodb')
 const mongoose = require('mongoose')
 
 const imageSchema = new mongoose.Schema({
-    resumeId: {
-        type: ObjectId
-    },
     email: {
         type: String
     },
@@ -12,6 +9,9 @@ const imageSchema = new mongoose.Schema({
         type: String
     },
     style: {
+        type: String
+    },
+    type: {
         type: String
     }
 }, { timestamps: true })

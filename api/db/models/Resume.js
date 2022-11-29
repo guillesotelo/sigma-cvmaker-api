@@ -13,7 +13,22 @@ const resumeSchema = new mongoose.Schema({
     manager: {
         type: String
     },
+    managerEmail: {
+        type: String
+    },
     role: {
+        type: String
+    },
+    template: {
+        type: String
+    },
+    type: {
+        type: String
+    },
+    client: {
+        type: String
+    },
+    note: {
         type: String
     }
 }, { timestamps: true })

@@ -43,6 +43,36 @@ router.get('/myResume', async (req, res, next) => {
     }
 })
 
+//Get CV Logo
+router.get('/getCVLogo', async (req, res, next) => {
+    try {
+        const { type } = req.query
+        const logo = await Image.findOne({ type }).exec()
+        if (!logo) return res.status(401).json({ message: 'Logo not found' })
+        res.status(200).json(logo)
+
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
+//Save CV Logo
+router.post('/saveCVLogo', async (req, res, next) => {
+    try {
+        const { cvImage, type } = req.body
+
+        await Image.deleteOne({ type })
+        const uploaded = await Image.create({ data: cvImage, type })
+        if (!uploaded) return res.status(401).json({ message: 'Error uploading logo' })
+
+        res.status(200).json({ message: 'Logo updated successfully' })
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
 //Get Resume data by ID
 router.get('/getResumeById', async (req, res, next) => {
     try {
