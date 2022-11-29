@@ -25,14 +25,15 @@ const userSchema = new mongoose.Schema({
     manager: {
         type: String
     },
-    picture: {
-        type: String
-    },
     language: {
         type: String,
         default: 'en'
+    },
+    date: {
+        type: Date,
+        default: new Date()
     }
-})
+}, { timestamps: true })
 
 userSchema.pre('save', function (next) {
     const user = this

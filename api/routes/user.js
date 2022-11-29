@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { User } = require('../db/models')
+const { User, Image } = require('../db/models')
 const transporter = require('../helpers/mailer')
 const { encrypt, decrypt } = require('../helpers')
 const { REACT_APP_URL } = process.env
@@ -11,7 +11,7 @@ router.post('/login', async (req, res, next) => {
         const { email, password } = req.body
 
         const user = await User.findOne({ email }).exec()
-        if (!user) return res.status(401).json({ message: 'Email already in use' })
+        if (!user) return res.status(401).json({ message: 'Email not found' })
 
         const compareRes = await user.comparePassword(password)
         if (!compareRes) return res.status(401).send('Invalid credentials')
@@ -21,7 +21,6 @@ router.post('/login', async (req, res, next) => {
             email: user.email,
             manager: user.manager,
             isManager: user.isManager,
-            picture: user.picture || null,
             language: user.language || null
         })
 
@@ -34,13 +33,17 @@ router.post('/login', async (req, res, next) => {
 //Create new user / register
 router.post('/create', async (req, res, next) => {
     try {
-        const { username, email, password, manager, isManager } = req.body
+        const { username, email, password, manager, isManager, profilePic } = req.body
 
         const emailRegistered = await User.findOne({ email }).exec()
         if (emailRegistered) return res.status(401).send('Email already in use')
 
         const user = await User.create(req.body)
         if (!user) return res.status(400).send('Bad request')
+
+        if (user && profilePic) {
+            await Image.create({ email: user.email, data: profilePic })
+        }
 
         await transporter.sendMail({
             from: `"Sigma Resume" <${process.env.EMAIL}>`,
@@ -110,21 +113,59 @@ router.post('/create', async (req, res, next) => {
 //Update User Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { email, newData } = req.body
+        const { email, newData, profilePic } = req.body
 
         const newUser = await User.findOneAndUpdate(
             { email }, newData, { returnDocument: "after", useFindAndModify: false })
         if (!newUser) return res.status(404).send('Error updating User.')
 
+        if (profilePic && profilePic.profileImage) {
+            await Image.deleteOne({ email: newUser.email })
+            await Image.create({ 
+                email: newUser.email, 
+                data: profilePic.profileImage,
+                style: profilePic.style ? JSON.stringify(profilePic.style) : ''
+            })
+        }
 
         res.status(200).json({
             username: newUser.username,
             email: newUser.email,
             manager: newUser.manager,
             isManager: newUser.isManager,
-            picture: newUser.picture || null,
             language: newUser.language || null
         })
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
+//Get all users
+router.get('/getAll', async (req, res, next) => {
+    try {
+        const { email } = req.query
+        const { isAdmin, isManager } = await User.findOne({ email }).exec()
+
+        if (isAdmin || isManager) {
+            const users = await User.find().select('-password -_id').sort({ username: 1 })
+            if (!users) return res.status(404).send('No users found.')
+
+            res.status(200).json(users)
+        } else res.status(403).send('User does not have the required permission')
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
+//Get Profile Image by User ID
+router.get('/getProfileImage', async (req, res, next) => {
+    try {
+        const { email } = req.query
+        const profileImage = await Image.findOne({ email }).exec()
+        res.status(200).json(profileImage)
+
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')

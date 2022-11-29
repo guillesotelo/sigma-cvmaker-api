@@ -1,10 +1,6 @@
 const mongoose = require('mongoose')
 
 const reportSchema = new mongoose.Schema({
-    date: {
-        type: Date,
-        default: new Date()
-    },
     username: {
         type: String
     },
@@ -21,7 +17,7 @@ const reportSchema = new mongoose.Schema({
         type: Boolean,
         defaul: false
     }
-})
+}, { timestamps: true })
 
 const ReportModel = mongoose.model('ReportModel', reportSchema)
 

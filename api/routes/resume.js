@@ -29,30 +29,7 @@ router.get('/getAll', async (req, res, next) => {
     }
 })
 
-//Migration of profile images to new DB (One use only)
-// router.get('/migrateImages', async (req, res, next) => {
-//     try {
-//         const resumes = await Resume.find()
-//         if (resumes) {
-//             resumes.forEach(async (resume, i) => {
-//                 const newData = JSON.parse(resume.data)
-
-//                 delete newData.profilePic
-//                 delete newData.signature
-
-//                 const saved = await Resume.findOneAndUpdate({ _id: resume._id }, { data: JSON.stringify(newData) }, { returnDocument: "after", useFindAndModify: false })
-//                 console.log(`saved ${i}`, saved)
-//             })
-//         }
-
-//         return res.status(200).json('Migrated successfully')
-//     } catch (err) {
-//         console.error('Something went wrong!', err)
-//         res.send(500).send('Server Error')
-//     }
-// })
-
-
+//Get resume by email
 router.get('/myResume', async (req, res, next) => {
     try {
         const { email } = req.body
@@ -83,13 +60,13 @@ router.get('/getResumeById', async (req, res, next) => {
 //Create new resume
 router.post('/create', async (req, res, next) => {
     try {
-        const { profilePic, email, username, manager } = { ...req.body }
+        const { email, username, manager, profilePic } = { ...req.body }
         const newResume = await Resume.create(req.body)
 
         if (!newResume) return res.status(400).json('Error creating resume')
 
         if (newResume && profilePic) {
-            await Image.create({ resumeId: newResume._id, data: profilePic })
+            await Image.create({ email: email, data: profilePic })
         }
 
         if (manager && username) {
@@ -125,30 +102,17 @@ router.post('/create', async (req, res, next) => {
     }
 })
 
-//Get Profile Image by Resume ID
-router.get('/getProfileImage', async (req, res, next) => {
-    try {
-        const { _id } = req.query
-        const profileImage = await Image.findOne({ resumeId: _id }).exec()
-        res.status(200).json(profileImage)
-
-    } catch (err) {
-        console.error('Something went wrong!', err)
-        res.send(500).send('Server Error')
-    }
-})
-
 //Update resume by ID
 router.post('/update', async (req, res, next) => {
     try {
         const { _id, profilePic } = req.body
-        
+
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating resume')
 
         if (profilePic) {
-            await Image.deleteOne({ resumeId: _id })
-            await Image.create({ resumeId: _id, data: profilePic })
+            await Image.deleteOne({ email: updated.email })
+            await Image.create({ email: updated.email, data: profilePic })
         }
 
         res.status(200).json({ message: 'Resume updated successfully' })
