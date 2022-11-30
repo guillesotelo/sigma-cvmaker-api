@@ -1,7 +1,11 @@
 const mongoose = require('mongoose')
+const { ObjectId } = require('mongodb')
 
 const logShcema = new mongoose.Schema({
-    user: {
+    username: {
+        type: String
+    },
+    email: {
         type: String
     },
     details: {
@@ -9,6 +13,9 @@ const logShcema = new mongoose.Schema({
     },
     module: {
         type: String
+    },
+    itemId: {
+        type: ObjectId
     }
 }, { timestamps: true })
 

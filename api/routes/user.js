@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { User, Image } = require('../db/models')
+const { User, Image, Log } = require('../db/models')
 const transporter = require('../helpers/mailer')
 const { encrypt, decrypt } = require('../helpers')
 const { REACT_APP_URL } = process.env
@@ -14,9 +14,25 @@ router.post('/login', async (req, res, next) => {
         if (!user) return res.status(401).json({ message: 'Email not found' })
 
         const compareRes = await user.comparePassword(password)
-        if (!compareRes) return res.status(401).send('Invalid credentials')
+        if (!compareRes) {
+            await Log.create({
+                ...req.body,
+                details: `Failed login attempt`,
+                module: 'User',
+                itemId: user._id || null
+            })
+            return res.status(401).send('Invalid credentials')
+        }
+
+        await Log.create({
+            ...req.body,
+            details: `New login`,
+            module: 'User',
+            itemId: user._id || null
+        })
 
         res.status(200).json({
+            _id: user._id,
             username: user.username,
             email: user.email,
             manager: user.manager,
@@ -42,8 +58,19 @@ router.post('/create', async (req, res, next) => {
         if (!user) return res.status(400).send('Bad request')
 
         if (user && profilePic) {
-            await Image.create({ email: user.email, data: profilePic })
+            await Image.create({
+                email,
+                data: profilePic.profileImage,
+                style: profilePic.style ? JSON.stringify(profilePic.style) : ''
+            })
         }
+
+        await Log.create({
+            ...req.body,
+            details: `New user created`,
+            module: 'User',
+            itemId: user._id || null
+        })
 
         await transporter.sendMail({
             from: `"Sigma Resume" <${process.env.EMAIL}>`,
@@ -113,22 +140,29 @@ router.post('/create', async (req, res, next) => {
 //Update User Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { email, newData, profilePic } = req.body
+        const { _id, newData, profilePic } = req.body
 
-        const newUser = await User.findOneAndUpdate(
-            { email }, newData, { returnDocument: "after", useFindAndModify: false })
+        const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false })
         if (!newUser) return res.status(404).send('Error updating User.')
 
         if (profilePic && profilePic.profileImage) {
-            await Image.deleteOne({ email: newUser.email })
-            await Image.create({ 
-                email: newUser.email, 
+            await Image.deleteOne({ email: newData.email })
+            await Image.create({
+                email: newData.email,
                 data: profilePic.profileImage,
                 style: profilePic.style ? JSON.stringify(profilePic.style) : ''
             })
         }
 
+        await Log.create({
+            ...req.body,
+            details: `User updated`,
+            module: 'User',
+            itemId: newUser._id || null
+        })
+
         res.status(200).json({
+            id: newUser._id,
             username: newUser.username,
             email: newUser.email,
             manager: newUser.manager,
@@ -145,10 +179,10 @@ router.post('/update', async (req, res, next) => {
 router.get('/getAll', async (req, res, next) => {
     try {
         const { email } = req.query
-        const { isAdmin, isManager } = await User.findOne({ email }).exec()
+        const user = await User.findOne({ email }).exec()
 
-        if (isAdmin || isManager) {
-            const users = await User.find().select('-password -_id').sort({ username: 1 })
+        if (user && user.isManager) {
+            const users = await User.find().select('-password').sort({ username: 1 })
             if (!users) return res.status(404).send('No users found.')
 
             res.status(200).json(users)
@@ -190,6 +224,14 @@ router.post('/changePass', async (req, res, next) => {
             { email }, { password }, { returnDocument: "after", useFindAndModify: false })
         if (!updatedUser) return res.status(404).send('Error updating User.')
 
+        await Log.create({
+            ...req.body,
+            email,
+            details: `User password updated`,
+            module: 'User',
+            itemId: updatedUser._id || null
+        })
+
         await transporter.sendMail({
             from: `"Sigma Resume" <${process.env.EMAIL}>`,
             to: email,
@@ -217,6 +259,14 @@ router.post('/resetByEmail', async (req, res, next) => {
         const { email } = req.body
         const user = await User.findOne({ email }).exec()
         if (!user) return res.status(404).json('Email not found.')
+
+        await Log.create({
+            ...req.body,
+            email,
+            details: `Sent email for password recover`,
+            module: 'User',
+            itemId: user._id || null
+        })
 
         await transporter.sendMail({
             from: `"Sigma Resume" <${process.env.EMAIL}>`,
@@ -256,9 +306,16 @@ router.get('/admin', async (req, res, next) => {
 })
 
 //Logout
-router.get("/logout", (req, res, next) => {
-    req.user = null;
-    res.status(200).json({});
+router.get("/logout", async (req, res, next) => {
+    req.user = null
+
+    await Log.create({
+        ...req.body,
+        details: `User logged out`,
+        module: 'User'
+    })
+
+    res.status(200).json({})
 })
 
 module.exports = router

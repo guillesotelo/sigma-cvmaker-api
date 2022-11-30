@@ -1,15 +1,15 @@
 const express = require('express')
 const router = express.Router()
-const { ReportModel, User } = require('../db/models')
+const { ReportModel, User, Log } = require('../db/models')
 const transporter = require('../helpers/mailer')
 
 //Get all reports
 router.get('/getAll', async (req, res, next) => {
     try {
         const { email } = req.query
-        const { isAdmin } = await User.findOne({ email }).exec()
+        const user = await User.findOne({ email }).exec()
 
-        if (isAdmin) {
+        if (user.isAdmin) {
             const reports = await ReportModel.find().sort([['date', 'descending']])
             if (!reports) return res.status(404).send('No reports found.')
 
@@ -27,6 +27,13 @@ router.post('/create', async (req, res, next) => {
         const newReport = await ReportModel.create(req.body)
         if (!newReport) return res.status(400).json('Error creating report')
 
+        await Log.create({
+            ...req.body,
+            details: `New Report created`,
+            module: 'Report',
+            itemId: newReport._id || null
+        })
+
         res.status(200).json(newReport)
     } catch (err) {
         console.error('Something went wrong!', err)
@@ -42,6 +49,13 @@ router.post('/update', async (req, res, next) => {
 
         const updated = await ReportModel.findByIdAndUpdate(_id, reportData, { returnDocument: "after", useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating Report.')
+
+        await Log.create({
+            ...req.body,
+            details: `Report updated`,
+            module: 'Report',
+            itemId: _id || null
+        })
 
         res.status(200).json(updated)
     } catch (err) {

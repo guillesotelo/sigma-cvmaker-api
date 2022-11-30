@@ -28,10 +28,6 @@ const userSchema = new mongoose.Schema({
     language: {
         type: String,
         default: 'en'
-    },
-    date: {
-        type: Date,
-        default: new Date()
     }
 }, { timestamps: true })
 

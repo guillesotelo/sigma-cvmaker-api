@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { Resume, Image } = require('../db/models')
+const { Resume, Image, Log } = require('../db/models')
 const transporter = require('../helpers/mailer')
 const { REACT_APP_URL } = process.env
 const { encrypt, decrypt } = require('../helpers')
@@ -66,6 +66,13 @@ router.post('/saveCVLogo', async (req, res, next) => {
         const uploaded = await Image.create({ data: cvImage, type })
         if (!uploaded) return res.status(401).json({ message: 'Error uploading logo' })
 
+        await Log.create({
+            ...req.body,
+            details: `CV Logo uploaded`,
+            module: 'Image',
+            itemId: req.body._id || null
+        })
+
         res.status(200).json({ message: 'Logo updated successfully' })
     } catch (err) {
         console.error('Something went wrong!', err)
@@ -98,6 +105,13 @@ router.post('/create', async (req, res, next) => {
         if (newResume && profilePic) {
             await Image.create({ email: email, data: profilePic })
         }
+
+        await Log.create({
+            ...req.body,
+            details: `New CV created`,
+            module: 'CV',
+            itemId: newResume._id || null
+        })
 
         if (manager && username) {
             await transporter.sendMail({
@@ -145,6 +159,13 @@ router.post('/update', async (req, res, next) => {
             await Image.create({ email: updated.email, data: profilePic })
         }
 
+        await Log.create({
+            ...req.body,
+            details: `CV updated`,
+            module: 'CV',
+            itemId: _id || null
+        })
+
         res.status(200).json({ message: 'Resume updated successfully' })
     } catch (err) {
         console.error('Something went wrong!', err)
@@ -161,6 +182,13 @@ router.post('/remove', async (req, res, next) => {
 
         const removed = await Resume.deleteOne({ _id })
         if (!removed) return res.status(404).send('Error deleting resume')
+
+        await Log.create({
+            ...req.body,
+            details: `CV removed`,
+            module: 'CV',
+            itemId: _id || null
+        })
 
         res.status(200).json({ message: 'Resume removed successfully' })
     } catch (err) {
