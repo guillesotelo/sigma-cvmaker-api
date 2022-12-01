@@ -305,6 +305,26 @@ router.get('/admin', async (req, res, next) => {
     }
 })
 
+//Remove User
+router.post('/remove', async (req, res, next) => {
+    try {
+        const { email, userData } = req.body
+
+        const user = await User.findOne({ email }).exec()
+        if (!user) return res.status(401).send('Email not found')
+
+        if (user.isManager) {
+            const removed = await User.deleteOne({ email: userData.email }).exec()
+            return res.status(200).json(removed)
+        }
+
+        res.status(404).send('Error deleting user')
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
 //Logout
 router.get("/logout", async (req, res, next) => {
     req.user = null

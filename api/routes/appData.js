@@ -9,7 +9,7 @@ router.get('/getAll', async (req, res, next) => {
         const user = await User.findOne({ email }).exec()
 
         if (user && user.isManager) {
-            const appData = await AppData.find().sort([['date', 'descending']])
+            const appData = await AppData.find().sort([['updatedAt', 'descending']])
             if (!appData) return res.status(304).send('No App Data found.')
 
             res.status(200).json(appData)
