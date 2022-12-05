@@ -9,22 +9,14 @@ const { encrypt, decrypt } = require('../helpers')
 router.get('/getAll', async (req, res, next) => {
     try {
         const { email, getAll } = req.query
+        let resumes = null
 
-        if (getAll) {
-            const resumes = await Resume.find().sort([['updatedAt', 'descending']])
-            if (!resumes) return res.status(404).send('No CVs found')
+        if (getAll) resumes = await Resume.find().sort([['updatedAt', 'descending']])
+        else if (email) resumes = await Resume.find({ manager: email }).sort([['updatedAt', 'descending']])
 
-            return res.status(200).json(resumes)
-        }
-        else {
-            if (email) {
-                const resumes = await Resume.find({ manager: email }).sort([['updatedAt', 'descending']])
-                if (!resumes) return res.status(404).send('No CVs found')
+        if (!resumes) return res.status(404).send('No users found.')
 
-                return res.status(200).json(resumes)
-            }
-        }
-        return res.status(404).send('No resumes found')
+        res.status(200).json(resumes)
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')
