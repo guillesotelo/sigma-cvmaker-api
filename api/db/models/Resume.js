@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 
 const resumeSchema = new mongoose.Schema({
+    date: {
+        type: Date,
+        default: new Date()
+    },
     username: {
         type: String
     },
