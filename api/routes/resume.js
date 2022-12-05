@@ -75,9 +75,9 @@ router.post('/saveCVLogo', async (req, res, next) => {
 })
 
 //Get Resume data by ID
-router.get('/getResumeById', async (req, res, next) => {
+router.get('/getById', async (req, res, next) => {
     try {
-        const { _id } = req.body
+        const { _id } = req.query
         const resume = await Resume.findOne({ _id }).exec()
         if (!resume) return res.status(401).json({ message: 'Resume not found' })
 
