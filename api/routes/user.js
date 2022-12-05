@@ -143,7 +143,7 @@ router.post('/update', async (req, res, next) => {
         const { _id, newData, profilePic } = req.body
 
         const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false })
-        if (!newUser) return res.status(404).send('Error updating User.')
+        if (!newUser) return res.status(404).send('Error updating User')
 
         if (profilePic && profilePic.profileImage) {
             await Image.deleteOne({ email: newData.email })
@@ -183,7 +183,7 @@ router.get('/getAll', async (req, res, next) => {
 
         if (user && user.isManager) {
             const users = await User.find().select('-password').sort({ username: 1 })
-            if (!users) return res.status(404).send('No users found.')
+            if (!users) return res.status(404).send('No users found')
 
             res.status(200).json(users)
         } else res.status(403).send('User does not have the required permission')
@@ -198,6 +198,7 @@ router.get('/getProfileImage', async (req, res, next) => {
     try {
         const { email } = req.query
         const profileImage = await Image.findOne({ email }).exec()
+        if(!profileImage) return res.status(404).send('Pofile Image not found')
         res.status(200).json(profileImage)
 
     } catch (err) {
@@ -215,14 +216,14 @@ router.post('/changePass', async (req, res, next) => {
         const email = decrypt(userEmail)
 
         const userData = await User.findOne({ email })
-        if (!userData) return res.status(404).send('Email not found.')
+        if (!userData) return res.status(404).send('Email not found')
 
         const compareRes = await userData.comparePassword(currentPass)
         if (!compareRes) return res.status(401).send('Invalid credentials')
 
         const updatedUser = await User.findOneAndUpdate(
             { email }, { password }, { returnDocument: "after", useFindAndModify: false })
-        if (!updatedUser) return res.status(404).send('Error updating User.')
+        if (!updatedUser) return res.status(404).send('Error updating User')
 
         await Log.create({
             ...req.body,
@@ -258,7 +259,7 @@ router.post('/resetByEmail', async (req, res, next) => {
     try {
         const { email } = req.body
         const user = await User.findOne({ email }).exec()
-        if (!user) return res.status(404).json('Email not found.')
+        if (!user) return res.status(404).json('Email not found')
 
         await Log.create({
             ...req.body,

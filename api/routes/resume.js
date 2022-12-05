@@ -12,17 +12,19 @@ router.get('/getAll', async (req, res, next) => {
 
         if (getAll) {
             const resumes = await Resume.find().sort([['updatedAt', 'descending']])
-            if (!resumes) return res.status(404).send('No resumes found.')
+            if (!resumes) return res.status(404).send('No CVs found')
 
             return res.status(200).json(resumes)
         }
-        else if (email) {
-            const resumes = await Resume.find({ manager: email }).sort([['updatedAt', 'descending']])
-            if (!resumes) return res.status(404).send('No resumes found.')
+        else {
+            if (email) {
+                const resumes = await Resume.find({ manager: email }).sort([['updatedAt', 'descending']])
+                if (!resumes) return res.status(404).send('No CVs found')
 
-            return res.status(200).json(resumes)
+                return res.status(200).json(resumes)
+            }
         }
-        return res.status(404).send('No resumes found.')
+        return res.status(404).send('No resumes found')
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')
@@ -100,7 +102,7 @@ router.post('/create', async (req, res, next) => {
         const { email, username, manager, profilePic } = { ...req.body }
         const newResume = await Resume.create(req.body)
 
-        if (!newResume) return res.status(400).json('Error creating resume')
+        if (!newResume) return res.status(400).json('Error creating CV')
 
         if (newResume && profilePic) {
             await Image.create({ email: email, data: profilePic })
@@ -152,7 +154,7 @@ router.post('/update', async (req, res, next) => {
         const { _id, profilePic } = req.body
 
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
-        if (!updated) return res.status(404).send('Error updating resume')
+        if (!updated) return res.status(404).send('Error updating CV')
 
         if (profilePic) {
             await Image.deleteOne({ email: updated.email })
@@ -166,7 +168,7 @@ router.post('/update', async (req, res, next) => {
             itemId: _id || null
         })
 
-        res.status(200).json({ message: 'Resume updated successfully' })
+        res.status(200).json({ message: 'CV updated successfully' })
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')
@@ -178,10 +180,10 @@ router.post('/remove', async (req, res, next) => {
     try {
         const { _id } = req.body
         const exists = await Resume.findOne({ _id }).exec()
-        if (!exists) return res.status(404).send('Error deleting resume')
+        if (!exists) return res.status(404).send('Error deleting CV')
 
         const removed = await Resume.deleteOne({ _id })
-        if (!removed) return res.status(404).send('Error deleting resume')
+        if (!removed) return res.status(404).send('Error deleting CV')
 
         await Log.create({
             ...req.body,
@@ -190,7 +192,7 @@ router.post('/remove', async (req, res, next) => {
             itemId: _id || null
         })
 
-        res.status(200).json({ message: 'Resume removed successfully' })
+        res.status(200).json({ message: 'CV removed successfully' })
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')
