@@ -28,7 +28,8 @@ router.post('/create', async (req, res, next) => {
         if (!newReport) return res.status(400).json('Error creating report')
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `New Report created`,
             module: 'Report',
             itemId: newReport._id || null
@@ -51,7 +52,8 @@ router.post('/update', async (req, res, next) => {
         if (!updated) return res.status(404).send('Error updating Report.')
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `Report updated`,
             module: 'Report',
             itemId: _id || null

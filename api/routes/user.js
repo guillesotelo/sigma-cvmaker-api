@@ -16,7 +16,8 @@ router.post('/login', async (req, res, next) => {
         const compareRes = await user.comparePassword(password)
         if (!compareRes) {
             await Log.create({
-                ...req.body,
+                username: req.body.username || '',
+                email: req.body.email || '',
                 details: `Failed login attempt`,
                 module: 'User',
                 itemId: user._id || null
@@ -25,20 +26,14 @@ router.post('/login', async (req, res, next) => {
         }
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `New login`,
             module: 'User',
             itemId: user._id || null
         })
 
-        res.status(200).json({
-            _id: user._id,
-            username: user.username,
-            email: user.email,
-            manager: user.manager,
-            isManager: user.isManager,
-            language: user.language || null
-        })
+        res.status(200).json({ ...user._doc, password: null })
 
     } catch (err) {
         console.error('Something went wrong!', err)
@@ -66,7 +61,8 @@ router.post('/create', async (req, res, next) => {
         }
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `New user created`,
             module: 'User',
             itemId: user._id || null
@@ -155,23 +151,17 @@ router.post('/update', async (req, res, next) => {
         }
 
         await Log.create({
-            ...req.body,
+            ususername: newData.username || '',
+            email: newData.email || '',
             details: `User updated`,
             module: 'User',
-            itemId: newUser._id || null
+            itemId: _id || null
         })
 
-        res.status(200).json({
-            id: newUser._id,
-            username: newUser.username,
-            email: newUser.email,
-            manager: newUser.manager,
-            isManager: newUser.isManager,
-            language: newUser.language || null
-        })
+        res.status(200).json({ ...newUser._doc, password: null })
     } catch (err) {
         console.error('Something went wrong!', err)
-        res.send(500).send('Server Error')
+        return res.send(500).send('Server Error')
     }
 })
 
@@ -193,12 +183,25 @@ router.get('/getAll', async (req, res, next) => {
     }
 })
 
+//Get all managers
+router.get('/getManagers', async (req, res, next) => {
+    try {
+        const managers = await User.find({ isManager: true }).select('-password').sort({ username: 1 })
+        if (!managers) return res.status(404).send('No managers found')
+
+        res.status(200).json(managers)
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
 //Get Profile Image by User ID
 router.get('/getProfileImage', async (req, res, next) => {
     try {
         const { email } = req.query
         const profileImage = await Image.findOne({ email }).exec()
-        if(!profileImage) return res.status(404).send('Pofile Image not found')
+        if (!profileImage) return res.status(404).send('Pofile Image not found')
         res.status(200).json(profileImage)
 
     } catch (err) {
@@ -226,7 +229,7 @@ router.post('/changePass', async (req, res, next) => {
         if (!updatedUser) return res.status(404).send('Error updating User')
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
             email,
             details: `User password updated`,
             module: 'User',
@@ -262,7 +265,7 @@ router.post('/resetByEmail', async (req, res, next) => {
         if (!user) return res.status(404).json('Email not found')
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
             email,
             details: `Sent email for password recover`,
             module: 'User',
@@ -316,6 +319,15 @@ router.post('/remove', async (req, res, next) => {
 
         if (user.isManager) {
             const removed = await User.deleteOne({ email: userData.email }).exec()
+
+            await Log.create({
+                username: req.body.username || '',
+                email: req.body.email || '',
+                details: `User removed`,
+                module: 'User',
+                itemId: user._id || null
+            })
+
             return res.status(200).json(removed)
         }
 
@@ -331,7 +343,8 @@ router.get("/logout", async (req, res, next) => {
     req.user = null
 
     await Log.create({
-        ...req.body,
+        username: req.body.username || '',
+        email: req.body.email || '',
         details: `User logged out`,
         module: 'User'
     })

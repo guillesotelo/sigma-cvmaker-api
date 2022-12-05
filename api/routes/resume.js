@@ -61,7 +61,8 @@ router.post('/saveCVLogo', async (req, res, next) => {
         if (!uploaded) return res.status(401).json({ message: 'Error uploading logo' })
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `CV Logo uploaded`,
             module: 'Image',
             itemId: req.body._id || null
@@ -101,7 +102,8 @@ router.post('/create', async (req, res, next) => {
         }
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `New CV created`,
             module: 'CV',
             itemId: newResume._id || null
@@ -154,7 +156,8 @@ router.post('/update', async (req, res, next) => {
         }
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `CV updated`,
             module: 'CV',
             itemId: _id || null
@@ -178,7 +181,8 @@ router.post('/remove', async (req, res, next) => {
         if (!removed) return res.status(404).send('Error deleting CV')
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `CV removed`,
             module: 'CV',
             itemId: _id || null

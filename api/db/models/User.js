@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    phone: {
+        type: String
+    },
+    location: {
+        type: String
+    },
     manager: {
         type: String
     },

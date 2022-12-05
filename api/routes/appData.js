@@ -29,7 +29,7 @@ router.get('/getByType', async (req, res, next) => {
         if (user && user.isManager) {
             const appData = await AppData.findOne({ type }).exec()
             if (!appData) return res.status(304).send('No App Data found.')
-            
+
             res.status(200).json(appData)
         } else res.status(403).send('User does not have the required permission')
     } catch (err) {
@@ -45,7 +45,8 @@ router.post('/create', async (req, res, next) => {
         if (!newData) return res.status(400).json('Error creating App Data')
 
         await Log.create({
-            ...req.body,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `New App Data created, type: ${req.body.type || 'no type'}`,
             module: 'App Data',
             itemId: newData._id || null
@@ -69,7 +70,8 @@ router.post('/update', async (req, res, next) => {
         if (!updated) return res.status(404).send('Error updating App Data.')
 
         await Log.create({
-            ...newData,
+            username: req.body.username || '',
+            email: req.body.email || '',
             details: `App Data updated, type: ${type || 'no type'}`,
             module: 'App Data',
             itemId: newData._id || null
