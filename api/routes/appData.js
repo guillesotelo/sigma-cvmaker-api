@@ -23,15 +23,12 @@ router.get('/getAll', async (req, res, next) => {
 //Get App Data by type
 router.get('/getByType', async (req, res, next) => {
     try {
-        const { email, type } = req.query
-        const user = await User.findOne({ email }).exec()
+        const { type } = req.query
 
-        if (user && user.isManager) {
-            const appData = await AppData.findOne({ type }).exec()
-            if (!appData) return res.status(304).send('No App Data found.')
+        const appData = await AppData.findOne({ type }).exec()
+        if (!appData) return res.status(304).send('No App Data found.')
 
-            res.status(200).json(appData)
-        } else res.status(403).send('User does not have the required permission')
+        res.status(200).json(appData)
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')
@@ -62,11 +59,10 @@ router.post('/create', async (req, res, next) => {
 //Update App Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { type } = req.body
-        let newData = { ...req.body }
+        const { type, data } = req.body
 
-        const updated = await User.findOneAndUpdate(
-            { type }, newData, { returnDocument: "after", useFindAndModify: false })
+        const updated = await AppData.findOneAndUpdate(
+            { type }, { data }, { returnDocument: "after", useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating App Data.')
 
         await Log.create({
@@ -74,7 +70,7 @@ router.post('/update', async (req, res, next) => {
             email: req.body.email || '',
             details: `App Data updated, type: ${type || 'no type'}`,
             module: 'App Data',
-            itemId: newData._id || null
+            itemId: updated._id || null
         })
 
         res.status(200).json(updated)
