@@ -28,7 +28,10 @@ const userSchema = new mongoose.Schema({
     location: {
         type: String
     },
-    manager: {
+    managerName: {
+        type: String
+    },
+    managerEmail: {
         type: String
     },
     language: {
