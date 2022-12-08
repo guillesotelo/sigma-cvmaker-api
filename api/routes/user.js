@@ -52,7 +52,7 @@ router.post('/create', async (req, res, next) => {
         const user = await User.create(req.body)
         if (!user) return res.status(400).send('Bad request')
 
-        if (user && profilePic) {
+        if (profilePic) {
             await Image.create({
                 email,
                 data: profilePic.profileImage,

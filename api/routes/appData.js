@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { AppData, Log, User } = require('../db/models')
+const { AppData, Log, User, Image } = require('../db/models')
 
 //Get all App Data
 router.get('/getAll', async (req, res, next) => {
@@ -38,8 +38,17 @@ router.get('/getByType', async (req, res, next) => {
 //Create new App Data
 router.post('/create', async (req, res, next) => {
     try {
+        const { clientLogo, clientEmail } = req.body
         const newData = await AppData.create(req.body)
         if (!newData) return res.status(400).json('Error creating App Data')
+
+        if(clientLogo && clientLogo.logoImage && clientEmail) {
+            await Image.create({
+                email: clientEmail,
+                data: clientLogo.logoImage,
+                style: clientLogo.style ? JSON.stringify(clientLogo.style) : ''
+            })
+        }
 
         await Log.create({
             username: req.body.username || '',
@@ -59,11 +68,20 @@ router.post('/create', async (req, res, next) => {
 //Update App Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { type, data } = req.body
+        const { type, data, clientLogo, clientEmail } = req.body
 
         const updated = await AppData.findOneAndUpdate(
             { type }, { data }, { returnDocument: "after", useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating App Data.')
+
+        if(clientLogo && clientLogo.logoImage && clientEmail) {
+            await Image.deleteOne({ email: clientEmail })
+            await Image.create({
+                email: clientEmail,
+                data: clientLogo.logoImage,
+                style: clientLogo.style ? JSON.stringify(clientLogo.style) : ''
+            })
+        }
 
         await Log.create({
             username: req.body.username || '',
