@@ -14,7 +14,7 @@ const resumeSchema = new mongoose.Schema({
     data: {
         type: String
     },
-    manager: {
+    managerName: {
         type: String
     },
     managerEmail: {
