@@ -92,7 +92,7 @@ router.get('/getById', async (req, res, next) => {
 //Create new resume
 router.post('/create', async (req, res, next) => {
     try {
-        const { email, username, managerEmail, profilePic } = { ...req.body }
+        const { email, username, managerEmail, profilePic, user } = { ...req.body }
         const newResume = await Resume.create(req.body)
 
         if (!newResume) return res.status(400).json('Error creating CV')
@@ -102,9 +102,9 @@ router.post('/create', async (req, res, next) => {
         }
 
         await Log.create({
-            username: req.body.username || '',
-            email: req.body.email || '',
-            details: `New CV created`,
+            username: user && user.username || '',
+            email: user && user.email || '',
+            details: `New CV created: ${newResume.username || ''}-${newResume.type || ''}`,
             module: 'CV',
             itemId: newResume._id || null
         })
@@ -147,7 +147,7 @@ router.post('/create', async (req, res, next) => {
 //Update resume by ID
 router.post('/update', async (req, res, next) => {
     try {
-        const { _id, profilePic } = req.body
+        const { _id, profilePic, user } = req.body
 
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating CV')
@@ -158,9 +158,9 @@ router.post('/update', async (req, res, next) => {
         }
 
         await Log.create({
-            username: req.body.username || '',
-            email: req.body.email || '',
-            details: `CV updated`,
+            username: user && user.username || '',
+            email: user && user.email || '',
+            details: `CV updated: ${updated.username || ''}-${updated.type || ''}`,
             module: 'CV',
             itemId: _id || null
         })
