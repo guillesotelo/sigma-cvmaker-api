@@ -16,8 +16,8 @@ router.post('/login', async (req, res, next) => {
         const compareRes = await user.comparePassword(password)
         if (!compareRes) {
             await Log.create({
-                username: req.body.username || '',
-                email: req.body.email || '',
+                username: user.username || '',
+                email: user.email || '',
                 details: `Failed login attempt`,
                 module: 'User',
                 itemId: user._id || null
@@ -26,8 +26,8 @@ router.post('/login', async (req, res, next) => {
         }
 
         await Log.create({
-            username: req.body.username || '',
-            email: req.body.email || '',
+            username: user.username || '',
+            email: user.email || '',
             details: `New login`,
             module: 'User',
             itemId: user._id || null
@@ -68,63 +68,63 @@ router.post('/create', async (req, res, next) => {
             itemId: user._id || null
         })
 
-        await transporter.sendMail({
-            from: `"Sigma Resume" <${process.env.EMAIL}>`,
-            to: email,
-            subject: `Welcome to Sigma CV!`,
-            html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
-                        <tbody>
-                            <tr>
-                                <td style='align-items: center; margin: 3vw auto; text-align: center;'>
-                                    <h2>Hello, ${username.split(' ')[0]}!</h2>
-                                    <h3>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
-                                    <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
-                                        <h3>Name: ${username}</h3>
-                                        <h3>Email: ${email}</h3>
-                                        <h3>Password: ${password}</h3>
-                                    </div>
-                                    <h3>${managerEmail ? `If you have any questions you can ask your manager (${managerEmail})` : ''}</h3>
-                                    <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
-                                    <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px; text-decoration: 'none';'>Sigma CV Maker</h5></a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>`
-        }).catch((err) => {
-            console.error('Something went wrong!', err)
-            res.send(500).send('Server Error')
-        })
+        // await transporter.sendMail({
+        //     from: `"Sigma Resume" <${process.env.EMAIL}>`,
+        //     to: email,
+        //     subject: `Welcome to Sigma CV!`,
+        //     html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
+        //                 <tbody>
+        //                     <tr>
+        //                         <td style='align-items: center; margin: 3vw auto; text-align: center;'>
+        //                             <h2>Hello, ${username.split(' ')[0]}!</h2>
+        //                             <h3>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
+        //                             <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
+        //                                 <h3>Name: ${username}</h3>
+        //                                 <h3>Email: ${email}</h3>
+        //                                 <h3>Password: ${password}</h3>
+        //                             </div>
+        //                             <h3>${managerEmail ? `If you have any questions you can ask your manager (${managerEmail})` : ''}</h3>
+        //                             <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
+        //                             <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px; text-decoration: 'none';'>Sigma CV Maker</h5></a>
+        //                         </td>
+        //                     </tr>
+        //                 </tbody>
+        //             </table>`
+        // }).catch((err) => {
+        //     console.error('Something went wrong!', err)
+        //     res.send(500).send('Server Error')
+        // })
 
-        if (managerEmail) {
-            await transporter.sendMail({
-                from: `"Sigma Resume" <${process.env.EMAIL}>`,
-                to: managerEmail,
-                subject: `A new user has been created`,
-                html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
-                            <tbody>
-                                <tr>
-                                    <td style='align-items: center; margin: 3vw auto; text-align: center;'>
-                                        <h2>Hello!</h2>
-                                        <h3>A new user has been created with you as the manager.</h3>
-                                        <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
-                                            <h3 style='text-align: center;'>User details</h3>
-                                            <h3>Name: ${username}</h3>
-                                            <h3>Email: ${email}</h3>
-                                            <h3>Password: ${password}</h3>
-                                            <h3>Manager: ${managerEmail}</h3>
-                                            <h3>Is Manager: ${isManager ? 'Yes' : 'No'}</h3>
-                                        </div>
-                                        <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
-                                        <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px; text-decoration: 'none';'>Sigma CV Maker</h5></a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>`
-            }).catch((err) => {
-                console.error('Something went wrong!', err)
-                res.send(500).send('Server Error')
-            })
-        }
+        // if (managerEmail) {
+        //     await transporter.sendMail({
+        //         from: `"Sigma Resume" <${process.env.EMAIL}>`,
+        //         to: managerEmail,
+        //         subject: `A new user has been created`,
+        //         html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
+        //                     <tbody>
+        //                         <tr>
+        //                             <td style='align-items: center; margin: 3vw auto; text-align: center;'>
+        //                                 <h2>Hello!</h2>
+        //                                 <h3>A new user has been created with you as the manager.</h3>
+        //                                 <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
+        //                                     <h3 style='text-align: center;'>User details</h3>
+        //                                     <h3>Name: ${username}</h3>
+        //                                     <h3>Email: ${email}</h3>
+        //                                     <h3>Password: ${password}</h3>
+        //                                     <h3>Manager: ${managerEmail}</h3>
+        //                                     <h3>Is Manager: ${isManager ? 'Yes' : 'No'}</h3>
+        //                                 </div>
+        //                                 <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
+        //                                 <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px; text-decoration: 'none';'>Sigma CV Maker</h5></a>
+        //                             </td>
+        //                         </tr>
+        //                     </tbody>
+        //                 </table>`
+        //     }).catch((err) => {
+        //         console.error('Something went wrong!', err)
+        //         res.send(500).send('Server Error')
+        //     })
+        // }
 
         res.status(201).send(`User created successfully`)
     } catch (err) {
