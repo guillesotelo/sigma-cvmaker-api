@@ -63,7 +63,7 @@ router.post('/create', async (req, res, next) => {
         await Log.create({
             username: user.username || '',
             email: user.email || '',
-            details: `New user created`,
+            details: `New user created: ${newUser.username}`,
             module: 'User',
             itemId: newUser._id || null
         })
@@ -153,7 +153,7 @@ router.post('/update', async (req, res, next) => {
         await Log.create({
             username: user.username || '',
             email: user.email || '',
-            details: `User updated`,
+            details: `User updated: ${newUser.username}`,
             module: 'User',
             itemId: _id || null
         })
@@ -231,7 +231,7 @@ router.post('/changePass', async (req, res, next) => {
         await Log.create({
             username: req.body.username || '',
             email,
-            details: `User password updated`,
+            details: `User password updated: ${userData.username}`,
             module: 'User',
             itemId: updatedUser._id || null
         })
@@ -323,7 +323,7 @@ router.post('/remove', async (req, res, next) => {
             await Log.create({
                 username: req.body.username || '',
                 email: req.body.email || '',
-                details: `User removed`,
+                details: `User removed: ${removed.username}`,
                 module: 'User',
                 itemId: user._id || null
             })
@@ -340,13 +340,13 @@ router.post('/remove', async (req, res, next) => {
 
 //Logout
 router.get("/logout", async (req, res, next) => {
-    req.user = null
 
     await Log.create({
-        username: req.body.username || '',
-        email: req.body.email || '',
+        username: req.query.username || '',
+        email: req.query.email || '',
         details: `User logged out`,
-        module: 'User'
+        module: 'User',
+        itemId: req.query._id || null
     })
 
     res.status(200).json({})
