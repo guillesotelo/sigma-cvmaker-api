@@ -44,13 +44,13 @@ router.post('/login', async (req, res, next) => {
 //Create new user / register
 router.post('/create', async (req, res, next) => {
     try {
-        const { username, email, password, managerEmail, isManager, profilePic } = req.body
+        const { username, email, password, managerEmail, isManager, profilePic, user } = req.body
 
         const emailRegistered = await User.findOne({ email }).exec()
         if (emailRegistered) return res.status(401).send('Email already in use')
 
-        const user = await User.create(req.body)
-        if (!user) return res.status(400).send('Bad request')
+        const newUser = await User.create(req.body)
+        if (!newUser) return res.status(400).send('Bad request')
 
         if (profilePic && profilePic.profileImage) {
             await Image.create({
@@ -61,11 +61,11 @@ router.post('/create', async (req, res, next) => {
         }
 
         await Log.create({
-            username: req.body.username || '',
-            email: req.body.email || '',
+            username: user.username || '',
+            email: user.email || '',
             details: `New user created`,
             module: 'User',
-            itemId: user._id || null
+            itemId: newUser._id || null
         })
 
         // await transporter.sendMail({
@@ -136,7 +136,7 @@ router.post('/create', async (req, res, next) => {
 //Update User Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { _id, newData, profilePic } = req.body
+        const { _id, newData, profilePic, user } = req.body
 
         const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false })
         if (!newUser) return res.status(404).send('Error updating User')
@@ -151,8 +151,8 @@ router.post('/update', async (req, res, next) => {
         }
 
         await Log.create({
-            ususername: newData.username || '',
-            email: newData.email || '',
+            username: user.username || '',
+            email: user.email || '',
             details: `User updated`,
             module: 'User',
             itemId: _id || null
