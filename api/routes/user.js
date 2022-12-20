@@ -158,7 +158,10 @@ router.post('/update', async (req, res, next) => {
             itemId: _id || null
         })
 
-        res.status(200).json({ ...newUser._doc, password: null })
+        res.status(200).json({ 
+            ...newUser._doc,
+            password: null 
+        })
     } catch (err) {
         console.error('Something went wrong!', err)
         return res.send(500).send('Server Error')
@@ -292,7 +295,7 @@ router.post('/resetByEmail', async (req, res, next) => {
 })
 
 //Check if it's admin user
-router.get('/admin', async (req, res, next) => {
+router.get('/permissions', async (req, res, next) => {
     try {
         const { email } = req.query
 
@@ -300,7 +303,8 @@ router.get('/admin', async (req, res, next) => {
         if (!user) return res.status(401).send('Email not found')
 
         res.status(200).json({
-            isAdmin: user.isAdmin || false
+            isAdmin: user.isAdmin || false,
+            isManager: user.isManager || false
         })
 
     } catch (err) {
