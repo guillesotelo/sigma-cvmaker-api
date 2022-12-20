@@ -321,11 +321,11 @@ router.post('/remove', async (req, res, next) => {
             const removed = await User.deleteOne({ email: userData.email }).exec()
 
             await Log.create({
-                username: req.body.username || '',
-                email: req.body.email || '',
-                details: `User removed: ${removed.username}`,
+                username: user.username || '',
+                email: user.email || '',
+                details: `User removed: ${userData.username}`,
                 module: 'User',
-                itemId: user._id || null
+                itemId: userData._id || null
             })
 
             return res.status(200).json(removed)
