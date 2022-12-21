@@ -97,8 +97,12 @@ router.post('/create', async (req, res, next) => {
 
         if (!newResume) return res.status(400).json('Error creating CV')
 
-        if (newResume && profilePic) {
-            await Image.create({ email: email, data: profilePic })
+        if (newResume && profilePic && profilePic.profileImage) {
+            await Image.create({
+                email: email,
+                data: profilePic.profileImage,
+                style: profilePic.style ? JSON.stringify(profilePic.style) : ''
+            })
         }
 
         await Log.create({
@@ -152,9 +156,13 @@ router.post('/update', async (req, res, next) => {
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating CV')
 
-        if (profilePic) {
+        if (updated && profilePic && profilePic.profileImage) {
             await Image.deleteOne({ email: updated.email })
-            await Image.create({ email: updated.email, data: profilePic })
+            await Image.create({
+                email: updated.email,
+                data: profilePic.profileImage,
+                style: profilePic.style ? JSON.stringify(profilePic.style) : ''
+            })
         }
 
         await Log.create({
