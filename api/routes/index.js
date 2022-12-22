@@ -6,15 +6,13 @@ const resumeRoutes = require('./resume')
 const reportRoutes = require('./report')
 const logRoutes = require('./log')
 const appDataRoutes = require('./appData')
+const imageRoutes = require('./image')
 
 router.use('/resume', resumeRoutes)
 router.use('/user', userRoutes)
 router.use('/report', reportRoutes)
 router.use('/log', logRoutes)
 router.use('/app', appDataRoutes)
-
-// router.get('/', async (req, res, next) => {
-//     res.send('Sigma CV Maker API')
-// })
+router.use('/image', imageRoutes)
 
 module.exports = router

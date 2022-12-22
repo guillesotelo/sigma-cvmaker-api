@@ -38,14 +38,16 @@ router.get('/getByType', async (req, res, next) => {
 //Create new App Data
 router.post('/create', async (req, res, next) => {
     try {
-        const { clientLogo, clientEmail } = req.body
+        const { clientLogo, clientName, clientEmail } = req.body
         const newData = await AppData.create(req.body)
         if (!newData) return res.status(400).json('Error creating App Data')
 
         if(clientLogo && clientLogo.logoImage && clientEmail) {
             await Image.create({
+                name: clientName,
                 email: clientEmail,
                 data: clientLogo.logoImage,
+                type: 'Client Logo',
                 style: clientLogo.style ? JSON.stringify(clientLogo.style) : ''
             })
         }
@@ -68,7 +70,7 @@ router.post('/create', async (req, res, next) => {
 //Update App Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { type, data, clientLogo, clientEmail } = req.body
+        const { type, data, clientLogo, clientName, clientEmail } = req.body
 
         const updated = await AppData.findOneAndUpdate(
             { type }, { data }, { returnDocument: "after", useFindAndModify: false })
@@ -77,8 +79,10 @@ router.post('/update', async (req, res, next) => {
         if(clientLogo && clientLogo.logoImage && clientEmail) {
             await Image.deleteOne({ email: clientEmail })
             await Image.create({
+                name: clientName,
                 email: clientEmail,
                 data: clientLogo.logoImage,
+                type: 'Client Logo',
                 style: clientLogo.style ? JSON.stringify(clientLogo.style) : ''
             })
         }

@@ -52,10 +52,12 @@ router.post('/create', async (req, res, next) => {
         const newUser = await User.create(req.body)
         if (!newUser) return res.status(400).send('Bad request')
 
-        if (profilePic && profilePic.profileImage) {
+        if (profilePic && profilePic.image) {
             await Image.create({
+                name: newUser.username,
                 email,
-                data: profilePic.profileImage,
+                data: profilePic.image,
+                type: 'Profile',
                 style: profilePic.style ? JSON.stringify(profilePic.style) : ''
             })
         }
@@ -141,11 +143,13 @@ router.post('/update', async (req, res, next) => {
         const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false })
         if (!newUser) return res.status(404).send('Error updating User')
 
-        if (profilePic && profilePic.profileImage) {
+        if (profilePic && profilePic.image) {
             await Image.deleteOne({ email: newData.email })
             await Image.create({
+                name: newUser.name,
                 email: newData.email,
-                data: profilePic.profileImage,
+                data: profilePic.image,
+                type: 'Profile',
                 style: profilePic.style ? JSON.stringify(profilePic.style) : ''
             })
         }

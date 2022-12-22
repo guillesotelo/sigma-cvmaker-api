@@ -57,7 +57,11 @@ router.post('/saveCVLogo', async (req, res, next) => {
         const { cvImage, type } = req.body
 
         await Image.deleteOne({ type })
-        const uploaded = await Image.create({ data: cvImage, type })
+        const uploaded = await Image.create({ 
+            data: cvImage,
+            name: 'Main CV Image',
+            type: type || 'CV Logo'
+        })
         if (!uploaded) return res.status(401).json({ message: 'Error uploading logo' })
 
         await Log.create({
@@ -97,10 +101,12 @@ router.post('/create', async (req, res, next) => {
 
         if (!newResume) return res.status(400).json('Error creating CV')
 
-        if (newResume && profilePic && profilePic.profileImage) {
+        if (newResume && profilePic && profilePic.image) {
             await Image.create({
+                name: username,
                 email: email,
-                data: profilePic.profileImage,
+                data: profilePic.image,
+                type: 'Profile',
                 style: profilePic.style ? JSON.stringify(profilePic.style) : ''
             })
         }
@@ -156,11 +162,13 @@ router.post('/update', async (req, res, next) => {
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating CV')
 
-        if (updated && profilePic && profilePic.profileImage) {
+        if (updated && profilePic && profilePic.image) {
             await Image.deleteOne({ email: updated.email })
             await Image.create({
+                name: updated.username,
                 email: updated.email,
-                data: profilePic.profileImage,
+                data: profilePic.image,
+                type: 'Profile',
                 style: profilePic.style ? JSON.stringify(profilePic.style) : ''
             })
         }
@@ -168,7 +176,7 @@ router.post('/update', async (req, res, next) => {
         await Log.create({
             username: user && user.username || '',
             email: user && user.email || '',
-            details: `CV updated: ${updated.username || ''}-${updated.type || ''}`,
+            details: `CV updated: ${updated.username || ''} - ${updated.type || ''}`,
             module: 'CV',
             itemId: _id || null
         })
