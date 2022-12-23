@@ -140,6 +140,9 @@ router.post('/update', async (req, res, next) => {
     try {
         const { _id, newData, profilePic, user } = req.body
 
+        const _user = await User.findOne({ email: user.email }).exec()
+        if (!_user || !_user.isManager) return res.status(405).json({ message: 'User does not have the required permission' })
+
         const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false })
         if (!newUser) return res.status(404).send('Error updating User')
 
@@ -162,9 +165,9 @@ router.post('/update', async (req, res, next) => {
             itemId: _id || null
         })
 
-        res.status(200).json({ 
+        res.status(200).json({
             ...newUser._doc,
-            password: null 
+            password: null
         })
     } catch (err) {
         console.error('Something went wrong!', err)
