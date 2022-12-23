@@ -201,7 +201,7 @@ router.post('/remove', async (req, res, next) => {
         await Log.create({
             username: req.body.username || '',
             email: req.body.email || '',
-            details: `CV removed: ${removed.username}`,
+            details: `CV removed: ${exists.username}`,
             module: 'CV',
             itemId: _id || null
         })

@@ -323,7 +323,7 @@ router.post('/remove', async (req, res, next) => {
         const { email, userData } = req.body
 
         const user = await User.findOne({ email }).exec()
-        if (!user) return res.status(401).send('Email not found')
+        if (!user) return res.status(401).send('User not found')
 
         if (user.isManager) {
             const removed = await User.deleteOne({ email: userData.email }).exec()

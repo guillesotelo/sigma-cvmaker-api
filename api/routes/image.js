@@ -67,13 +67,16 @@ router.post('/remove', async (req, res, next) => {
     try {
         const { _id, user } = req.body
 
+        const image = await Image.findOne({ _id })
+        if (!image) return res.status(404).send('Image not found')
+
         const removed = await Image.deleteOne({ _id })
         if (!removed) return res.status(404).send('Error deleting Image')
 
         await Log.create({
             username: user.username || '',
             email: user.email || '',
-            details: `Image removed: ${removed.email}`,
+            details: `Image removed: ${image.email}`,
             module: 'Image',
             itemId: _id || null
         })
