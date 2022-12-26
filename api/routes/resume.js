@@ -191,7 +191,7 @@ router.post('/update', async (req, res, next) => {
 //Remove Mocement by ID
 router.post('/remove', async (req, res, next) => {
     try {
-        const { _id } = req.body
+        const { _id, user } = req.body
         const exists = await Resume.findOne({ _id }).exec()
         if (!exists) return res.status(404).send('Error deleting CV')
 
@@ -199,8 +199,8 @@ router.post('/remove', async (req, res, next) => {
         if (!removed) return res.status(404).send('Error deleting CV')
 
         await Log.create({
-            username: req.body.username || '',
-            email: req.body.email || '',
+            username: user.username || '',
+            email: user.email || '',
             details: `CV removed: ${exists.username}`,
             module: 'CV',
             itemId: _id || null

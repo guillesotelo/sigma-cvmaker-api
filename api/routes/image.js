@@ -42,8 +42,6 @@ router.post('/update', async (req, res, next) => {
     try {
         const { _id, user } = req.body
 
-        console.log("style", req.body.style)
-
         const updated = await Image.findByIdAndUpdate(_id, { ...req.body }, { returnDocument: "after", useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating Image')
 
