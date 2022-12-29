@@ -19,7 +19,11 @@ router.get('/getAll', async (req, res, next) => {
 router.post('/create', async (req, res, next) => {
     try {
         const { user } = req.body
-        const newImage = await Image.create(req.body)
+        const newImage = await Image.create({
+            ...req.body,
+            size: Buffer.byteLength(req.body.data, 'utf8')
+        })
+
         if (!newImage) return res.status(400).json('Error creating Image')
 
         await Log.create({
@@ -42,7 +46,10 @@ router.post('/update', async (req, res, next) => {
     try {
         const { _id, user } = req.body
 
-        const updated = await Image.findByIdAndUpdate(_id, { ...req.body }, { returnDocument: "after", useFindAndModify: false })
+        const updated = await Image.findByIdAndUpdate(_id, {
+            ...req.body,
+            size: Buffer.byteLength(req.body.data, 'utf8')
+        }, { returnDocument: "after", useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating Image')
 
         await Log.create({

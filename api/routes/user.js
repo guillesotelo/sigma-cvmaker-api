@@ -58,7 +58,8 @@ router.post('/create', async (req, res, next) => {
                 email,
                 data: profilePic.image,
                 type: 'Profile',
-                style: profilePic.style ? JSON.stringify(profilePic.style) : ''
+                style: profilePic.style ? JSON.stringify(profilePic.style) : '',
+                size: Buffer.byteLength(profilePic.image, 'utf8')
             })
         }
 
@@ -153,7 +154,8 @@ router.post('/update', async (req, res, next) => {
                 email: newData.email,
                 data: profilePic.image,
                 type: 'Profile',
-                style: profilePic.style ? JSON.stringify(profilePic.style) : ''
+                style: profilePic.style ? JSON.stringify(profilePic.style) : '',
+                size: Buffer.byteLength(profilePic.image, 'utf8')
             })
         }
 
@@ -206,13 +208,27 @@ router.get('/getManagers', async (req, res, next) => {
     }
 })
 
-//Get Profile Image by User ID
+//Get Profile Image by email
 router.get('/getProfileImage', async (req, res, next) => {
     try {
         const { email } = req.query
-        const profileImage = await Image.findOne({ email }).exec()
+        const profileImage = await Image.findOne({ email, type: 'Profile' }).exec()
         if (!profileImage) return res.status(404).send('Pofile Image not found')
         res.status(200).json(profileImage)
+
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
+//Get Signature by email
+router.get('/getSignature', async (req, res, next) => {
+    try {
+        const { email } = req.query
+        const signature = await Image.findOne({ email, type: 'Signature' }).exec()
+        if (!signature) return res.status(404).send('Signature not found')
+        res.status(200).json(signature)
 
     } catch (err) {
         console.error('Something went wrong!', err)
@@ -330,6 +346,7 @@ router.post('/remove', async (req, res, next) => {
 
         if (user.isManager) {
             const removed = await User.deleteOne({ email: userData.email }).exec()
+            await Image.deleteMany({ email: userData.email })
 
             await Log.create({
                 username: user.username || '',

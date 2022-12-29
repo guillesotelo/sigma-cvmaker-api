@@ -57,10 +57,11 @@ router.post('/saveCVLogo', async (req, res, next) => {
         const { cvImage, type } = req.body
 
         await Image.deleteOne({ type })
-        const uploaded = await Image.create({ 
+        const uploaded = await Image.create({
             data: cvImage,
             name: 'Main CV Image',
-            type: type || 'CV Logo'
+            type: type || 'CV Logo',
+            size: Buffer.byteLength(cvImage, 'utf8')
         })
         if (!uploaded) return res.status(401).json({ message: 'Error uploading logo' })
 
@@ -96,7 +97,7 @@ router.get('/getById', async (req, res, next) => {
 //Create new resume
 router.post('/create', async (req, res, next) => {
     try {
-        const { email, username, managerEmail, profilePic, user } = { ...req.body }
+        const { email, username, managerEmail, profilePic, user, signatureCanvas } = { ...req.body }
         const newResume = await Resume.create(req.body)
 
         if (!newResume) return res.status(400).json('Error creating CV')
@@ -107,7 +108,19 @@ router.post('/create', async (req, res, next) => {
                 email: email,
                 data: profilePic.image,
                 type: 'Profile',
-                style: profilePic.style ? JSON.stringify(profilePic.style) : ''
+                style: profilePic.style ? JSON.stringify(profilePic.style) : '',
+                size: Buffer.byteLength(profilePic.image, 'utf8')
+            })
+        }
+
+        if (newResume && signatureCanvas && signatureCanvas.image) {
+            await Image.create({
+                name: username,
+                email: email,
+                data: signatureCanvas.image,
+                type: 'Signature',
+                style: signatureCanvas.style ? JSON.stringify(signatureCanvas.style) : '',
+                size: Buffer.byteLength(signatureCanvas.image, 'utf8')
             })
         }
 
@@ -157,19 +170,32 @@ router.post('/create', async (req, res, next) => {
 //Update resume by ID
 router.post('/update', async (req, res, next) => {
     try {
-        const { _id, profilePic, user } = req.body
+        const { _id, profilePic, user, signatureCanvas } = req.body
 
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating CV')
 
         if (updated && profilePic && profilePic.image) {
-            await Image.deleteOne({ email: updated.email })
+            await Image.deleteOne({ email: updated.email, type: 'Profile' })
             await Image.create({
                 name: updated.username,
                 email: updated.email,
                 data: profilePic.image,
                 type: 'Profile',
-                style: profilePic.style ? JSON.stringify(profilePic.style) : ''
+                style: profilePic.style ? JSON.stringify(profilePic.style) : '',
+                size: Buffer.byteLength(profilePic.image, 'utf8')
+            })
+        }
+
+        if (updated && signatureCanvas && signatureCanvas.image) {
+            await Image.deleteOne({ email: updated.email, type: 'Signature' })
+            await Image.create({
+                name: updated.username,
+                email: updated.email,
+                data: signatureCanvas.image,
+                type: 'Signature',
+                style: signatureCanvas.style ? JSON.stringify(signatureCanvas.style) : '',
+                size: Buffer.byteLength(signatureCanvas.image, 'utf8')
             })
         }
 
@@ -196,6 +222,11 @@ router.post('/remove', async (req, res, next) => {
         if (!exists) return res.status(404).send('Error deleting CV')
 
         const removed = await Resume.deleteOne({ _id })
+
+        if (exists.type === 'Master') {
+            await Image.deleteOne({ email: exists.email, type: 'Signature' })
+        }
+
         if (!removed) return res.status(404).send('Error deleting CV')
 
         await Log.create({

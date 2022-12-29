@@ -48,7 +48,8 @@ router.post('/create', async (req, res, next) => {
                 email: clientEmail,
                 data: clientLogo.logoImage,
                 type: 'Client Logo',
-                style: clientLogo.style ? JSON.stringify(clientLogo.style) : ''
+                style: clientLogo.style ? JSON.stringify(clientLogo.style) : '',
+                size: Buffer.byteLength(clientLogo.logoImage, 'utf8')
             })
         }
 
@@ -83,7 +84,8 @@ router.post('/update', async (req, res, next) => {
                 email: clientEmail,
                 data: clientLogo.logoImage,
                 type: 'Client Logo',
-                style: clientLogo.style ? JSON.stringify(clientLogo.style) : ''
+                style: clientLogo.style ? JSON.stringify(clientLogo.style) : '',
+                size: Buffer.byteLength(clientLogo.logoImage, 'utf8')
             })
         }
 
