@@ -94,6 +94,20 @@ router.get('/getById', async (req, res, next) => {
     }
 })
 
+//Get Master Resume
+router.get('/getByType', async (req, res, next) => {
+    try {
+        const { email, type } = req.query
+        const cv = await Resume.findOne({ email, type }).exec()
+        if (!cv) return res.status(401).json({ message: 'CV not found' })
+
+        res.status(200).json(cv)
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
 //Create new resume
 router.post('/create', async (req, res, next) => {
     try {
