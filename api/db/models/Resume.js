@@ -34,6 +34,10 @@ const resumeSchema = new mongoose.Schema({
     },
     note: {
         type: String
+    },
+    removed: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true })
 

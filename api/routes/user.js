@@ -139,10 +139,15 @@ router.post('/create', async (req, res, next) => {
 //Update User Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { _id, newData, profilePic, user } = req.body
+        const { _id, newData, profilePic, user, managerUpdate, email } = req.body
 
         const _user = await User.findOne({ email: user.email }).exec()
         if (!_user || !_user.isManager) return res.status(405).json({ message: 'User does not have the required permission' })
+
+        if (managerUpdate && email) {
+            const newUser = await User.findOneAndUpdate({ email }, newData, { returnDocument: "after", useFindAndModify: false })
+            if (newUser) return res.status(200).json({ ...newUser, password: null })
+        }
 
         const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false })
         if (!newUser) return res.status(404).send('Error updating User')
@@ -212,7 +217,7 @@ router.get('/getManagers', async (req, res, next) => {
 router.get('/getProfileImage', async (req, res, next) => {
     try {
         const { email } = req.query
-        const profileImage = await Image.findOne({ email, type: 'Profile' }).exec()
+        const profileImage = await Image.findOne({ email, type: 'Profile', removed: false }).exec()
         if (!profileImage) return res.status(404).send('Pofile Image not found')
         res.status(200).json(profileImage)
 
@@ -226,7 +231,7 @@ router.get('/getProfileImage', async (req, res, next) => {
 router.get('/getSignature', async (req, res, next) => {
     try {
         const { email } = req.query
-        const signature = await Image.findOne({ email, type: 'Signature' }).exec()
+        const signature = await Image.findOne({ email, type: 'Signature', removed: false }).exec()
         if (!signature) return res.status(404).send('Signature not found')
         res.status(200).json(signature)
 
@@ -345,18 +350,24 @@ router.post('/remove', async (req, res, next) => {
         if (!user) return res.status(401).send('User not found')
 
         if (user.isManager) {
-            const removed = await User.deleteOne({ email: userData.email }).exec()
-            await Image.deleteMany({ email: userData.email })
+            const removed = await User.findOneAndUpdate(
+                { email: userData.email },
+                { removed: true },
+                { returnDocument: "after", useFindAndModify: false }
+            )
+            if (!removed) return res.status(401).send('Error deleting user')
+
+            await Image.updateMany({ email: userData.email }, { removed: true })
 
             await Log.create({
                 username: user.username || '',
                 email: user.email || '',
-                details: `User removed: ${userData.username}`,
+                details: `User moved to trash: ${userData.username}`,
                 module: 'User',
                 itemId: userData._id || null
             })
 
-            return res.status(200).json(removed)
+            return res.status(200).json({ ...removed, password: null })
         }
 
         res.status(404).send('Error deleting user')

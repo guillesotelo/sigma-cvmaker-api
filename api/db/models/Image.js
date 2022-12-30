@@ -18,6 +18,10 @@ const imageSchema = new mongoose.Schema({
     },
     size: {
         type: String
+    },
+    removed: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true })
 

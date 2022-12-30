@@ -75,13 +75,16 @@ router.post('/remove', async (req, res, next) => {
         const image = await Image.findOne({ _id })
         if (!image) return res.status(404).send('Image not found')
 
-        const removed = await Image.deleteOne({ _id })
+        const removed = await Image.findByIdAndUpdate(_id,
+            { removed: true },
+            { returnDocument: "after", useFindAndModify: false }
+        )
         if (!removed) return res.status(404).send('Error deleting Image')
 
         await Log.create({
             username: user.username || '',
             email: user.email || '',
-            details: `Image removed: ${image.email}`,
+            details: `Image moved to trash: ${image.email}`,
             module: 'Image',
             itemId: _id || null
         })
