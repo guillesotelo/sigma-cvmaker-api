@@ -67,6 +67,54 @@ router.post('/update', async (req, res, next) => {
     }
 })
 
+//Get Image by email and type
+router.get('/getByType', async (req, res, next) => {
+    try {
+        const { name, email, type } = req.query
+        let image = null
+
+        if (name) {
+            image = await Image.findOne({ name, type, removed: false }).exec()
+        }
+        else if (email) {
+            image = await Image.findOne({ email, type, removed: false }).exec()
+        }
+
+        if (!image) return res.status(404).send('Image not found')
+        res.status(200).json(image)
+
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
+//Get Client Logo by Company Name
+router.get('/getClientLogo', async (req, res, next) => {
+    try {
+        const { client } = req.query
+
+        const logo = await Image.findOne({ name: client, removed: false }).exec()
+
+        res.status(200).json(logo || {})
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
+//Get all Client Logos
+router.get('/getAllClientLogos', async (req, res, next) => {
+    try {
+        const logos = await Image.find({ type: 'Client Logo', removed: false }).exec()
+        if (!logos || !logos.length) return res.status(404).send('No logos found')
+        res.status(200).json(logos)
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
 //Remove Image
 router.post('/remove', async (req, res, next) => {
     try {

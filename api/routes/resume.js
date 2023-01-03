@@ -111,7 +111,17 @@ router.get('/getByType', async (req, res, next) => {
 //Create new resume
 router.post('/create', async (req, res, next) => {
     try {
-        const { email, username, managerEmail, profilePic, user, signatureCanvas, type } = { ...req.body }
+        const {
+            email,
+            username,
+            managerEmail,
+            profilePic,
+            clientLogos,
+            clients,
+            user,
+            signatureCanvas,
+            type
+        } = { ...req.body }
         const newResume = await Resume.create(req.body)
 
         if (!newResume) return res.status(400).json('Error creating CV')
@@ -131,6 +141,7 @@ router.post('/create', async (req, res, next) => {
                 })
             }
         }
+
         if (type === 'Master' || (type === 'Variant' && !signature)) {
             if (newResume && signatureCanvas && signatureCanvas.image) {
                 await Image.create({
@@ -142,6 +153,28 @@ router.post('/create', async (req, res, next) => {
                     size: Buffer.byteLength(signatureCanvas.image, 'utf8')
                 })
             }
+        }
+
+        if (clientLogos && clients) {
+            Object.keys(clientLogos).forEach(async index => {
+
+                const exists = await Image.findOne({
+                    name: clients[index],
+                    type: 'Client Logo',
+                    removed: false
+                }).exec()
+
+                if (!exists && clientLogos[index] && clientLogos[index].image) {
+                    await Image.create({
+                        name: clients[index],
+                        email: '',
+                        data: clientLogos[index].image || '',
+                        type: 'Client Logo',
+                        style: clientLogos[index].style ? JSON.stringify(clientLogos[index].style) : '',
+                        size: Buffer.byteLength(clientLogos[index].image || '', 'utf8')
+                    })
+                }
+            })
         }
 
         await Log.create({
@@ -190,7 +223,16 @@ router.post('/create', async (req, res, next) => {
 //Update resume by ID
 router.post('/update', async (req, res, next) => {
     try {
-        const { _id, type, email, profilePic, user, signatureCanvas } = req.body
+        const {
+            _id,
+            type,
+            email,
+            profilePic,
+            signatureCanvas,
+            clientLogos,
+            clients,
+            user
+        } = req.body
 
         const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating CV')
@@ -217,6 +259,28 @@ router.post('/update', async (req, res, next) => {
                     type: 'Signature',
                     style: signatureCanvas.style ? JSON.stringify(signatureCanvas.style) : '',
                     size: Buffer.byteLength(signatureCanvas.image, 'utf8')
+                })
+            }
+
+            if (clientLogos && clients) {
+                Object.keys(clientLogos).forEach(async index => {
+
+                    const exists = await Image.findOne({
+                        name: clients[index],
+                        type: 'Client Logo',
+                        removed: false
+                    }).exec()
+
+                    if (!exists && clientLogos[index] && clientLogos[index].image) {
+                        await Image.create({
+                            name: clients[index],
+                            email: '',
+                            data: clientLogos[index].image || '',
+                            type: 'Client Logo',
+                            style: clientLogos[index].style ? JSON.stringify(clientLogos[index].style) : '',
+                            size: Buffer.byteLength(clientLogos[index].image || '', 'utf8')
+                        })
+                    }
                 })
             }
 
