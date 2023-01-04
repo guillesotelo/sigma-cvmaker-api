@@ -11,7 +11,7 @@ router.get('/getAll', async (req, res, next) => {
         const { email, getAll } = req.query
         let resumes = null
 
-        if (getAll) resumes = await Resume.find().select('-data').sort([['updatedAt', 'descending']])
+        if (getAll) resumes = await Resume.find().sort([['updatedAt', 'descending']])
         else if (email) resumes = await Resume.find({ managerEmail: email }).select('-data').sort([['updatedAt', 'descending']])
 
         if (!resumes) return res.status(404).send('No users found.')
