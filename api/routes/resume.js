@@ -139,6 +139,14 @@ router.post('/create', async (req, res, next) => {
                     style: profilePic.style ? JSON.stringify(profilePic.style) : '',
                     size: Buffer.byteLength(profilePic.image, 'utf8')
                 })
+
+                await Log.create({
+                    username: user && user.username || '',
+                    email: user && user.email || '',
+                    details: `New image created: ${username}, type: Profile`,
+                    module: 'Image',
+                    itemId: newResume._id || null
+                })
             }
         }
 
@@ -151,6 +159,14 @@ router.post('/create', async (req, res, next) => {
                     type: 'Signature',
                     style: signatureCanvas.style ? JSON.stringify(signatureCanvas.style) : '',
                     size: Buffer.byteLength(signatureCanvas.image, 'utf8')
+                })
+
+                await Log.create({
+                    username: user && user.username || '',
+                    email: user && user.email || '',
+                    details: `New image created: ${username}, type: Signature`,
+                    module: 'Image',
+                    itemId: newResume._id || null
                 })
             }
         }
@@ -172,6 +188,14 @@ router.post('/create', async (req, res, next) => {
                         type: 'Client Logo',
                         style: clientLogos[index].style ? JSON.stringify(clientLogos[index].style) : '',
                         size: Buffer.byteLength(clientLogos[index].image || '', 'utf8')
+                    })
+
+                    await Log.create({
+                        username: user && user.username || '',
+                        email: user && user.email || '',
+                        details: `New image created: ${clients[index]}, type: Client Logo`,
+                        module: 'Image',
+                        itemId: newResume._id || null
                     })
                 }
             })
@@ -248,6 +272,14 @@ router.post('/update', async (req, res, next) => {
                     style: profilePic.style ? JSON.stringify(profilePic.style) : '',
                     size: Buffer.byteLength(profilePic.image, 'utf8')
                 })
+
+                await Log.create({
+                    username: user && user.username || '',
+                    email: user && user.email || '',
+                    details: `Image updated: ${updated.username}, type: Profile`,
+                    module: 'Image',
+                    itemId: updated._id || null
+                })
             }
 
             if (signatureCanvas && signatureCanvas.image) {
@@ -259,6 +291,14 @@ router.post('/update', async (req, res, next) => {
                     type: 'Signature',
                     style: signatureCanvas.style ? JSON.stringify(signatureCanvas.style) : '',
                     size: Buffer.byteLength(signatureCanvas.image, 'utf8')
+                })
+
+                await Log.create({
+                    username: user && user.username || '',
+                    email: user && user.email || '',
+                    details: `Image updated: ${updated.username}, type: Signature`,
+                    module: 'Image',
+                    itemId: updated._id || null
                 })
             }
 
@@ -279,6 +319,14 @@ router.post('/update', async (req, res, next) => {
                             type: 'Client Logo',
                             style: clientLogos[index].style ? JSON.stringify(clientLogos[index].style) : '',
                             size: Buffer.byteLength(clientLogos[index].image || '', 'utf8')
+                        })
+
+                        await Log.create({
+                            username: user && user.username || '',
+                            email: user && user.email || '',
+                            details: `New image created: ${updated.username}, type: Client Logo`,
+                            module: 'Image',
+                            itemId: updated._id || null
                         })
                     }
                 })
@@ -315,14 +363,26 @@ router.post('/remove', async (req, res, next) => {
         if (!exists) return res.status(404).send('Error deleting CV')
 
         const removed = await Resume.findByIdAndUpdate(_id, { removed: true }, { useFindAndModify: false })
+        let variants = null
 
         if (exists.type === 'Master') {
-            await Image.findOneAndUpdate(
+            const image = await Image.findOneAndUpdate(
                 { email: exists.email, type: 'Signature' },
                 { removed: true },
                 { returnDocument: "after", useFindAndModify: false }
             )
-            await Resume.updateMany({ email, type: 'Variant' }, { removed: true })
+
+            if (image) {
+                await Log.create({
+                    username: user && user.username || '',
+                    email: user && user.email || '',
+                    details: `Image moved to trash: ${exists.username}, type: Signature`,
+                    module: 'Image',
+                    itemId: exists._id || null
+                })
+            }
+
+            variants = await Resume.updateMany({ email, type: 'Variant' }, { removed: true })
         }
 
         if (!removed) return res.status(404).send('Error deleting CV')
@@ -330,7 +390,8 @@ router.post('/remove', async (req, res, next) => {
         await Log.create({
             username: user.username || '',
             email: user.email || '',
-            details: `CV moved to trash: ${exists.username}`,
+            details: variants && variants.length ? `CV moved to trash along with ${variants.length} variants: ${exists.username}`
+                : `CV moved to trash: ${exists.username}`,
             module: 'CV',
             itemId: _id || null
         })

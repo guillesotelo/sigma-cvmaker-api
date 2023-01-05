@@ -357,7 +357,19 @@ router.post('/remove', async (req, res, next) => {
             )
             if (!removed) return res.status(401).send('Error deleting user')
 
-            await Image.updateMany({ email: userData.email }, { removed: true })
+            const images = await Image.updateMany({ email: userData.email }, { removed: true })
+
+            if (images && images.length) {
+                for (let i = 0; i < images.length; i++) {
+                    await Log.create({
+                        username: user.username || '',
+                        email: user.email || '',
+                        details: `Image moved to trash: ${images[i].name || images[i].email}`,
+                        module: 'Image',
+                        itemId: images[i]._id || null
+                    })
+                }
+            }
 
             await Log.create({
                 username: user.username || '',
