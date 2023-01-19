@@ -38,7 +38,7 @@ router.get('/getByType', async (req, res, next) => {
 //Create new App Data
 router.post('/create', async (req, res, next) => {
     try {
-        const { clientLogo, clientName, clientEmail } = req.body
+        const { clientLogo, clientName, clientEmail, user } = req.body
         const newData = await AppData.create(req.body)
         if (!newData) return res.status(400).json('Error creating App Data')
 
@@ -54,8 +54,8 @@ router.post('/create', async (req, res, next) => {
         }
 
         await Log.create({
-            username: req.body.username || '',
-            email: req.body.email || '',
+            username: user.username || '',
+            email: user.email || '',
             details: `New App Data created, type: ${req.body.type || 'no type'}`,
             module: 'App Data',
             itemId: newData._id || null
@@ -71,8 +71,8 @@ router.post('/create', async (req, res, next) => {
 //Update App Data
 router.post('/update', async (req, res, next) => {
     try {
-        const { type, data, clientLogo, clientName, clientEmail } = req.body
-
+        const { type, data, clientLogo, clientName, clientEmail, user } = req.body
+       
         const updated = await AppData.findOneAndUpdate(
             { type }, { data }, { returnDocument: "after", useFindAndModify: false })
         if (!updated) return res.status(404).send('Error updating App Data.')
@@ -90,8 +90,8 @@ router.post('/update', async (req, res, next) => {
         }
 
         await Log.create({
-            username: req.body.username || '',
-            email: req.body.email || '',
+            username: user.username || '',
+            email: user.email || '',
             details: `App Data updated, type: ${type || 'no type'}`,
             module: 'App Data',
             itemId: updated._id || null
