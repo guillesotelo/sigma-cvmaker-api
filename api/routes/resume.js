@@ -14,7 +14,7 @@ router.get('/getAll', async (req, res, next) => {
         if (getAll) resumes = await Resume.find().sort([['updatedAt', 'descending']])
         else if (email) resumes = await Resume.find({ managerEmail: email }).select('-data').sort([['updatedAt', 'descending']])
 
-        if (!resumes) return res.status(200).send('No users found.')
+        if (!resumes) return res.status(404).send('No CVs found.')
 
         res.status(200).json(resumes)
     } catch (err) {
