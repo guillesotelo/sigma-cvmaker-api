@@ -14,7 +14,7 @@ router.get('/getAll', async (req, res, next) => {
         if (getAll) resumes = await Resume.find().sort([['updatedAt', 'descending']])
         else if (email) resumes = await Resume.find({ managerEmail: email }).select('-data').sort([['updatedAt', 'descending']])
 
-        if (!resumes) return res.status(404).send('No users found.')
+        if (!resumes) return res.status(200).send('No users found.')
 
         res.status(200).json(resumes)
     } catch (err) {
@@ -129,8 +129,8 @@ router.post('/create', async (req, res, next) => {
         const profile = await Image.findOne({ email, type: 'Profile' }).exec()
         const signature = await Image.findOne({ email, type: 'Signature' }).exec()
 
-        if (type === 'Master' || (type === 'Variant' && !profile)) {
-            if (newResume && profilePic && profilePic.image) {
+        if ((profile && type === 'Master') || !profile) {
+            if (newResume && profilePic?.image) {
                 await Image.create({
                     name: username,
                     email: email,
@@ -150,8 +150,8 @@ router.post('/create', async (req, res, next) => {
             }
         }
 
-        if (type === 'Master' || (type === 'Variant' && !signature)) {
-            if (newResume && signatureCanvas && signatureCanvas.image) {
+        if ((signature && type === 'Master') || !signature) {
+            if (newResume && signatureCanvas?.image) {
                 await Image.create({
                     name: username,
                     email: email,

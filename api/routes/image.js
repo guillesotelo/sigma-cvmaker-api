@@ -6,7 +6,7 @@ const { Image, Log } = require('../db/models')
 router.get('/getAll', async (req, res, next) => {
     try {
         const images = await Image.find().sort([['updatedAt', 'descending']])
-        if (!images) return res.status(404).send('No Images found.')
+        if (!images) return res.status(200).send('No Images found.')
 
         res.status(200).json(images)
     } catch (err) {
@@ -80,7 +80,6 @@ router.get('/getByType', async (req, res, next) => {
             image = await Image.findOne({ email, type, removed: false }).exec()
         }
 
-        if (!image) return res.status(404).send('Image not found')
         res.status(200).json(image)
 
     } catch (err) {
@@ -107,7 +106,7 @@ router.get('/getClientLogo', async (req, res, next) => {
 router.get('/getAllClientLogos', async (req, res, next) => {
     try {
         const logos = await Image.find({ type: 'Client Logo', removed: false }).exec()
-        if (!logos || !logos.length) return res.status(404).send('No logos found')
+        if (!logos || !logos.length) return res.status(200).send('No logos found')
         res.status(200).json(logos)
     } catch (err) {
         console.error('Something went wrong!', err)

@@ -190,7 +190,7 @@ router.get('/getAll', async (req, res, next) => {
 
         if (user && user.isManager) {
             const users = await User.find().select('-password').sort({ username: 1 })
-            if (!users) return res.status(404).send('No users found')
+            if (!users) return res.status(200).send('No users found')
 
             res.status(200).json(users)
         } else res.status(403).send('User does not have the required permission')
@@ -204,7 +204,7 @@ router.get('/getAll', async (req, res, next) => {
 router.get('/getManagers', async (req, res, next) => {
     try {
         const managers = await User.find({ isManager: true }).select('-password').sort({ username: 1 })
-        if (!managers) return res.status(404).send('No managers found')
+        if (!managers) return res.status(200).send('No managers found')
 
         res.status(200).json(managers)
     } catch (err) {
@@ -218,7 +218,7 @@ router.get('/getProfileImage', async (req, res, next) => {
     try {
         const { email } = req.query
         const profileImage = await Image.findOne({ email, type: 'Profile', removed: false }).exec()
-        if (!profileImage) return res.status(404).send('Pofile Image not found')
+        if (!profileImage) return res.status(200).send('Pofile Image not found')
         res.status(200).json(profileImage)
 
     } catch (err) {
@@ -232,7 +232,7 @@ router.get('/getSignature', async (req, res, next) => {
     try {
         const { email } = req.query
         const signature = await Image.findOne({ email, type: 'Signature', removed: false }).exec()
-        if (!signature) return res.status(404).send('Signature not found')
+        if (!signature) return res.status(200).send('Signature not found')
         res.status(200).json(signature)
 
     } catch (err) {

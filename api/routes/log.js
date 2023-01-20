@@ -10,7 +10,7 @@ router.get('/getAll', async (req, res, next) => {
 
         if (!user || user.isManager) {
             const logs = await Log.find().sort([['updatedAt', 'descending']])
-            if (!logs) return res.status(404).send('No logs found.')
+            if (!logs) return res.status(200).send('No logs found.')
 
             res.status(200).json(logs)
         } else res.status(403).send('User does not have the required permission')
