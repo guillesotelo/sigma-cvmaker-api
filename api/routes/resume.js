@@ -131,19 +131,21 @@ router.post('/create', async (req, res, next) => {
 
         if ((profile && type === 'Master') || !profile) {
             if (newResume && profilePic?.image) {
-                await Image.create({
+                const imageData = {
                     name: username,
                     email: email,
                     data: profilePic.image,
                     type: 'Profile',
                     style: profilePic.style ? JSON.stringify(profilePic.style) : '',
                     size: Buffer.byteLength(profilePic.image, 'utf8')
-                })
+                }
+                if (profile) await Image.findByIdAndUpdate(profile._id, imageData, { useFindAndModify: false })
+                else await Image.create(imageData)
 
                 await Log.create({
                     username: user && user.username || '',
                     email: user && user.email || '',
-                    details: `New image created: ${username}, type: Profile`,
+                    details: `Image ${profile ? 'updated' : 'created'}: ${username}, type: Profile`,
                     module: 'Image',
                     itemId: newResume._id || null
                 })
@@ -152,19 +154,21 @@ router.post('/create', async (req, res, next) => {
 
         if ((signature && type === 'Master') || !signature) {
             if (newResume && signatureCanvas?.image) {
-                await Image.create({
+                const signatureData = {
                     name: username,
                     email: email,
-                    data: signatureCanvas.image,
-                    type: 'Signature',
-                    style: signatureCanvas.style ? JSON.stringify(signatureCanvas.style) : '',
-                    size: Buffer.byteLength(signatureCanvas.image, 'utf8')
-                })
+                    data: profilePic.image,
+                    type: 'Profile',
+                    style: profilePic.style ? JSON.stringify(profilePic.style) : '',
+                    size: Buffer.byteLength(profilePic.image, 'utf8')
+                }
+                if (signature) await Image.findByIdAndUpdate(signature._id, signatureData, { useFindAndModify: false })
+                else await Image.create(signatureData)
 
                 await Log.create({
                     username: user && user.username || '',
                     email: user && user.email || '',
-                    details: `New image created: ${username}, type: Signature`,
+                    details: `Image ${signature ? 'updated' : 'created'}: ${username}, type: Signature`,
                     module: 'Image',
                     itemId: newResume._id || null
                 })
@@ -263,40 +267,44 @@ router.post('/update', async (req, res, next) => {
 
         if (updated) {
             if (profilePic && profilePic.image) {
-                await Image.deleteOne({ email: updated.email, type: 'Profile' })
-                await Image.create({
+                const imageData = {
                     name: updated.username,
                     email: updated.email,
                     data: profilePic.image,
                     type: 'Profile',
                     style: profilePic.style ? JSON.stringify(profilePic.style) : '',
                     size: Buffer.byteLength(profilePic.image, 'utf8')
-                })
+                }
+                const { _id } = await Image.findOne({ email, type: 'Profile' }).exec()
+                if (_id) await Image.findByIdAndUpdate(_id, imageData, { useFindAndModify: false })
+                else await Image.create(imageData)
 
                 await Log.create({
                     username: user && user.username || '',
                     email: user && user.email || '',
-                    details: `Image updated: ${updated.username}, type: Profile`,
+                    details: `Image ${_id ? 'updated' : 'created'}: ${updated.username}, type: Profile`,
                     module: 'Image',
                     itemId: updated._id || null
                 })
             }
 
             if (signatureCanvas && signatureCanvas.image) {
-                await Image.deleteOne({ email: updated.email, type: 'Signature' })
-                await Image.create({
+                const signatureData = {
                     name: updated.username,
                     email: updated.email,
                     data: signatureCanvas.image,
                     type: 'Signature',
                     style: signatureCanvas.style ? JSON.stringify(signatureCanvas.style) : '',
                     size: Buffer.byteLength(signatureCanvas.image, 'utf8')
-                })
+                }
+                const { _id } = await Image.findOne({ email, type: 'Signature' }).exec()
+                if (_id) await Image.findByIdAndUpdate(_id, signatureData, { useFindAndModify: false })
+                else await Image.create(signatureData)
 
                 await Log.create({
                     username: user && user.username || '',
                     email: user && user.email || '',
-                    details: `Image updated: ${updated.username}, type: Signature`,
+                    details: `Image ${_id ? 'updated' : 'created'}: ${updated.username}, type: Signature`,
                     module: 'Image',
                     itemId: updated._id || null
                 })
