@@ -1,9 +1,14 @@
+const dotenv = require('dotenv')
 const express = require('express')
 const router = express.Router()
 const { User, Image, Log } = require('../db/models')
 const transporter = require('../helpers/mailer')
 const { encrypt, decrypt } = require('../helpers')
 const { REACT_APP_URL } = process.env
+const jwt = require('jsonwebtoken')
+dotenv.config()
+const { JWT_SECRET } = process.env
+const { verifyToken } = require('../helpers')
 
 //User Login
 router.post('/login', async (req, res, next) => {
@@ -25,6 +30,8 @@ router.post('/login', async (req, res, next) => {
             return res.status(401).send('Invalid credentials')
         }
 
+        const token = jwt.sign({ sub: user._id }, JWT_SECRET, { expiresIn: '30d' })
+
         await Log.create({
             username: user.username || '',
             email: user.email || '',
@@ -33,7 +40,38 @@ router.post('/login', async (req, res, next) => {
             itemId: user._id || null
         })
 
-        res.status(200).json({ ...user._doc, password: null })
+        const {
+            _id,
+            updatedAt,
+            createdAt,
+            username,
+            isManager,
+            isAdmin,
+            phone,
+            location,
+            managerName,
+            managerEmail,
+            language,
+            removed
+        } = user
+
+        res.status(200).json({
+            _id,
+            updatedAt,
+            createdAt,
+            username,
+            email: user.email,
+            isManager,
+            isAdmin,
+            phone,
+            location,
+            managerName,
+            managerEmail,
+            language,
+            removed,
+            token
+        })
+
 
     } catch (err) {
         console.error('Something went wrong!', err)
@@ -42,7 +80,7 @@ router.post('/login', async (req, res, next) => {
 })
 
 //Create new user / register
-router.post('/create', async (req, res, next) => {
+router.post('/create', verifyToken, async (req, res, next) => {
     try {
         const { username, email, password, managerEmail, isManager, profilePic, user } = req.body
 
@@ -137,7 +175,7 @@ router.post('/create', async (req, res, next) => {
 })
 
 //Update User Data
-router.post('/update', async (req, res, next) => {
+router.post('/update', verifyToken, async (req, res, next) => {
     try {
         const { _id, newData, profilePic, user, managerUpdate, email } = req.body
 
@@ -145,11 +183,11 @@ router.post('/update', async (req, res, next) => {
         if (!_user || !_user.isManager) return res.status(405).json({ message: 'User does not have the required permission' })
 
         if (managerUpdate && email) {
-            const newUser = await User.findOneAndUpdate({ email }, newData, { returnDocument: "after", useFindAndModify: false })
-            if (newUser) return res.status(200).json({ ...newUser, password: null })
+            const newUser = await User.findOneAndUpdate({ email }, newData, { returnDocument: "after", useFindAndModify: false }).select('-password')
+            if (newUser) return res.status(200).json(newUser)
         }
 
-        const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false })
+        const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false }).select('-password')
         if (!newUser) return res.status(404).send('Error updating User')
 
         if (profilePic && profilePic.image) {
@@ -172,10 +210,7 @@ router.post('/update', async (req, res, next) => {
             itemId: _id || null
         })
 
-        res.status(200).json({
-            ...newUser._doc,
-            password: null
-        })
+        res.status(200).json(newUser)
     } catch (err) {
         console.error('Something went wrong!', err)
         return res.send(500).send('Server Error')
@@ -183,7 +218,7 @@ router.post('/update', async (req, res, next) => {
 })
 
 //Get all users
-router.get('/getAll', async (req, res, next) => {
+router.get('/getAll', verifyToken, async (req, res, next) => {
     try {
         const { email } = req.query
         const user = await User.findOne({ email }).exec()
@@ -201,7 +236,7 @@ router.get('/getAll', async (req, res, next) => {
 })
 
 //Get all managers
-router.get('/getManagers', async (req, res, next) => {
+router.get('/getManagers', verifyToken, async (req, res, next) => {
     try {
         const managers = await User.find({ isManager: true }).select('-password').sort({ username: 1 })
         if (!managers) return res.status(200).send('No managers found')
@@ -214,7 +249,7 @@ router.get('/getManagers', async (req, res, next) => {
 })
 
 //Get Profile Image by email
-router.get('/getProfileImage', async (req, res, next) => {
+router.get('/getProfileImage', verifyToken, async (req, res, next) => {
     try {
         const { email } = req.query
         const profileImage = await Image.findOne({ email, type: 'Profile', removed: false }).exec()
@@ -228,7 +263,7 @@ router.get('/getProfileImage', async (req, res, next) => {
 })
 
 //Get Signature by email
-router.get('/getSignature', async (req, res, next) => {
+router.get('/getSignature', verifyToken, async (req, res, next) => {
     try {
         const { email } = req.query
         const signature = await Image.findOne({ email, type: 'Signature', removed: false }).exec()
@@ -342,7 +377,7 @@ router.get('/permissions', async (req, res, next) => {
 })
 
 //Remove User
-router.post('/remove', async (req, res, next) => {
+router.post('/remove', verifyToken, async (req, res, next) => {
     try {
         const { email, userData } = req.body
 
@@ -379,7 +414,7 @@ router.post('/remove', async (req, res, next) => {
                 itemId: userData._id || null
             })
 
-            return res.status(200).json({ ...removed, password: null })
+            return res.status(200).json(removed)
         }
 
         res.status(404).send('Error deleting user')

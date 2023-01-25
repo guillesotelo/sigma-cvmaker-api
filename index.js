@@ -1,8 +1,6 @@
 const express = require("express")
 const morgan = require("morgan")
-const path = require("path");
 const cors = require('cors')
-
 const { connection } = require("./api/db")
 const routes = require("./api/routes")
 const app = express()
