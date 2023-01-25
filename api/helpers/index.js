@@ -1,7 +1,11 @@
+const dotenv = require('dotenv')
+dotenv.config()
 const crypto = require('crypto');
 const ENC = 'bf3c199c2470cb477d907b1e0917c17b';
 const IV = "5183666c72eec9e4";
 const ALGO = "aes-256-cbc"
+const jwt = require('jsonwebtoken')
+const { JWT_SECRET } = process.env
 
 const encrypt = text => {
     let cipher = crypto.createCipheriv(ALGO, ENC, IV);
@@ -20,8 +24,10 @@ const verifyToken = (req, res, next) => {
     const bearerHeader = req.headers['authorization']
     if (bearerHeader) {
         const bearerToken = bearerHeader.split(' ')[1]
-        req.token = bearerToken
-        next()
+        jwt.verify(bearerToken, JWT_SECRET, (error, data) => {
+            if (error) return res.sendStatus(403)
+            next()
+        })
     } else res.sendStatus(403)
 }
 
