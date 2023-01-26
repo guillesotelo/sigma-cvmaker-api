@@ -312,30 +312,31 @@ router.post('/update', async (req, res, next) => {
 
             if (clientLogos && clients) {
                 Object.keys(clientLogos).forEach(async index => {
-
-                    const exists = await Image.findOne({
-                        name: clients[index],
-                        type: 'Client Logo',
-                        removed: false
-                    }).exec()
-
-                    if (!exists && clientLogos[index] && clientLogos[index].image) {
-                        await Image.create({
+                    if (clients[index]) {
+                        const exists = await Image.findOne({
                             name: clients[index],
-                            email: '',
-                            data: clientLogos[index].image || '',
                             type: 'Client Logo',
-                            style: clientLogos[index].style ? JSON.stringify(clientLogos[index].style) : '',
-                            size: Buffer.byteLength(clientLogos[index].image || '', 'utf8')
-                        })
+                            removed: false
+                        }).exec()
 
-                        await Log.create({
-                            username: user && user.username || '',
-                            email: user && user.email || '',
-                            details: `New image created: ${updated.username}, type: Client Logo`,
-                            module: 'Image',
-                            itemId: updated._id || null
-                        })
+                        if (!exists && clientLogos[index] && clientLogos[index].image) {
+                            await Image.create({
+                                name: clients[index],
+                                email: '',
+                                data: clientLogos[index].image || '',
+                                type: 'Client Logo',
+                                style: clientLogos[index].style ? JSON.stringify(clientLogos[index].style) : '',
+                                size: Buffer.byteLength(clientLogos[index].image || '', 'utf8')
+                            })
+
+                            await Log.create({
+                                username: user && user.username || '',
+                                email: user && user.email || '',
+                                details: `New image created: ${updated.username}, type: Client Logo`,
+                                module: 'Image',
+                                itemId: updated._id || null
+                            })
+                        }
                     }
                 })
             }

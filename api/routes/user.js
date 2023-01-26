@@ -191,15 +191,17 @@ router.post('/update', verifyToken, async (req, res, next) => {
         if (!newUser) return res.status(404).send('Error updating User')
 
         if (profilePic && profilePic.image) {
-            await Image.deleteOne({ email: newData.email })
-            await Image.create({
+            const imageData = {
                 name: newUser.name,
                 email: newData.email,
                 data: profilePic.image,
                 type: 'Profile',
                 style: profilePic.style ? JSON.stringify(profilePic.style) : '',
                 size: Buffer.byteLength(profilePic.image, 'utf8')
-            })
+            }
+            const exists = await Image.findOne({ email: newData.email, type: 'Profile' }).exec()
+            if (exists) await Image.findByIdAndUpdate(exists._id, imageData, { useFindAndModify: false })
+            else await Image.create(imageData)
         }
 
         await Log.create({
@@ -210,7 +212,9 @@ router.post('/update', verifyToken, async (req, res, next) => {
             itemId: _id || null
         })
 
-        res.status(200).json(newUser)
+        const token = jwt.sign({ sub: newUser._id }, JWT_SECRET, { expiresIn: '30d' })
+
+        res.status(200).json({ ...newUser._doc, token })
     } catch (err) {
         console.error('Something went wrong!', err)
         return res.send(500).send('Server Error')
