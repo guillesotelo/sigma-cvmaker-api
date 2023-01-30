@@ -283,7 +283,7 @@ router.get('/getSignature', verifyToken, async (req, res, next) => {
 //Change user password
 router.post('/changePass', async (req, res, next) => {
     try {
-        const { userEmail, password, currentPass } = req.body
+        const { userEmail, password } = req.body
         if (!userEmail) res.send(404).send('Wrong parameters')
 
         const email = decrypt(userEmail)
@@ -291,31 +291,28 @@ router.post('/changePass', async (req, res, next) => {
         const userData = await User.findOne({ email })
         if (!userData) return res.status(404).send('Email not found')
 
-        const compareRes = await userData.comparePassword(currentPass)
-        if (!compareRes) return res.status(401).send('Invalid credentials')
-
         const updatedUser = await User.findOneAndUpdate(
             { email }, { password }, { returnDocument: "after", useFindAndModify: false })
         if (!updatedUser) return res.status(404).send('Error updating User')
 
         await Log.create({
-            username: req.body.username || '',
+            username: updatedUser.username || '',
             email,
-            details: `User password updated: ${userData.username}`,
+            details: `User password updated: ${updatedUser.username}`,
             module: 'User',
             itemId: updatedUser._id || null
         })
 
         await transporter.sendMail({
-            from: `"Sigma Resume" <${process.env.EMAIL}>`,
+            from: `"Sigma CV App" <${process.env.EMAIL}>`,
             to: email,
             subject: 'Your password has been changed',
             html: `<div style='margin-top: 3vw; text-align: center;'>
                             <h2>Hello, ${userData.username}!</h2>
                             <h3>Your password has been changed.</h3>
-                            <h4>If it wasn't you, please <a href='${REACT_APP_URL}/changePass?userEmail=${userEmail}'>re-generate it</a> to a new one right away, or reply to this email with your registered email and username.</h4>
+                            <h4>If it wasn't you, please <a href='${REACT_APP_URL}/changePass?userEmail=${userEmail}'>re-generate it</a> to a new one.</h4>
                             <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
-                            <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>CtrlShift App</h5></a>
+                            <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma CV App</h5></a>
                         </div>`
         }).catch((err) => console.error('Something went wrong!', err))
 
@@ -335,22 +332,22 @@ router.post('/resetByEmail', async (req, res, next) => {
         if (!user) return res.status(404).json('Email not found')
 
         await Log.create({
-            username: req.body.username || '',
+            username: user.username || '',
             email,
-            details: `Sent email for password recover`,
+            details: `Email sent for password recover`,
             module: 'User',
             itemId: user._id || null
         })
 
         await transporter.sendMail({
-            from: `"Sigma Resume" <${process.env.EMAIL}>`,
+            from: `"Sigma CV App" <${process.env.EMAIL}>`,
             to: email,
             subject: 'Password Reset',
             html: `<div style='margin-top: 3vw; text-align: center;'>
                         <h2>Hello, ${user.username}!</h2>
                         <h3>Click <a href='${REACT_APP_URL}/changePass?userEmail=${encrypt(email)}'>here</a> to reset your password.</h3>
                         <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
-                        <h5 style='margin: 4px;'>CtrlShift Team</h5>
+                        <h5 style='margin: 4px;'>Sigma CV App</h5>
                     </div>`
         }).catch((err) => console.error('Something went wrong!', err))
 
