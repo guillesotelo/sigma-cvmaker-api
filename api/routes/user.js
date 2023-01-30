@@ -109,32 +109,31 @@ router.post('/create', verifyToken, async (req, res, next) => {
             itemId: newUser._id || null
         })
 
-        // await transporter.sendMail({
-        //     from: `"Sigma Resume" <${process.env.EMAIL}>`,
-        //     to: email,
-        //     subject: `Welcome to Sigma CV!`,
-        //     html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
-        //                 <tbody>
-        //                     <tr>
-        //                         <td style='align-items: center; margin: 3vw auto; text-align: center;'>
-        //                             <h2>Hello, ${username.split(' ')[0]}!</h2>
-        //                             <h3>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
-        //                             <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
-        //                                 <h3>Name: ${username}</h3>
-        //                                 <h3>Email: ${email}</h3>
-        //                                 <h3>Password: ${password}</h3>
-        //                             </div>
-        //                             <h3>${managerEmail ? `If you have any questions you can ask your manager (${managerEmail})` : ''}</h3>
-        //                             <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
-        //                             <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px; text-decoration: 'none';'>Sigma CV Maker</h5></a>
-        //                         </td>
-        //                     </tr>
-        //                 </tbody>
-        //             </table>`
-        // }).catch((err) => {
-        //     console.error('Something went wrong!', err)
-        //     res.send(500).send('Server Error')
-        // })
+        await transporter.sendMail({
+            from: `"Sigma Resume" <${process.env.EMAIL}>`,
+            to: email,
+            subject: `Welcome to Sigma CV App!`,
+            html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
+                        <tbody>
+                            <tr>
+                                <td style='align-items: center; margin: 3vw auto; text-align: center;'>
+                                    <h3 style='font-weight: normal; margin-bottom: 1vw;'>Hello, ${username ? username.split(' ')[0] : ''}!</h3>
+                                    <h3 style='font-weight: normal;'>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
+                                    <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
+                                        <h3 style='font-weight: normal;'>Name: ${username}</h3>
+                                        <h3 style='font-weight: normal;'>Email: ${email}</h3>
+                                        <h3 style='font-weight: normal; color: #cccccc;'>Password: ${password}</h3>
+                                    </div>
+                                    <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
+                                    <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>`
+        }).catch((err) => {
+            console.error('Something went wrong!', err)
+            res.send(500).send('Server Error')
+        })
 
         // if (managerEmail) {
         //     await transporter.sendMail({
@@ -308,12 +307,12 @@ router.post('/changePass', async (req, res, next) => {
             to: email,
             subject: 'Your password has been changed',
             html: `<div style='margin-top: 3vw; text-align: center;'>
-                            <h2>Hello, ${userData.username}!</h2>
-                            <h3>Your password has been changed.</h3>
-                            <h4>If it wasn't you, please <a href='${REACT_APP_URL}/changePass?userEmail=${userEmail}'>re-generate it</a> to a new one.</h4>
-                            <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
-                            <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px;'>Sigma CV App</h5></a>
-                        </div>`
+                        <h3 style='text-align: left; font-weight: normal; margin-bottom: 1vw;'>Hello, ${userData.username ? userData.username.split(' ')[0] : ''}!</h3>
+                        <h3 style='font-weight: normal;'>Your password has been changed.</h3>
+                        <h3 style='font-weight: normal;'>If it was a mistake, use <a style='text-decoration: none;' href='${REACT_APP_URL}/changePass?userEmail=${encrypt(userEmail)}'>this link</a> to generate a new one.</h3>
+                        <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
+                        <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
+                    </div>`
         }).catch((err) => console.error('Something went wrong!', err))
 
         res.status(200).json({ messsage: 'Password updated successfully' })
@@ -344,10 +343,12 @@ router.post('/resetByEmail', async (req, res, next) => {
             to: email,
             subject: 'Password Reset',
             html: `<div style='margin-top: 3vw; text-align: center;'>
-                        <h2>Hello, ${user.username}!</h2>
-                        <h3>Click <a href='${REACT_APP_URL}/changePass?userEmail=${encrypt(email)}'>here</a> to reset your password.</h3>
-                        <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
-                        <h5 style='margin: 4px;'>Sigma CV App</h5>
+                        <h3 style='text-align: left; font-weight: normal; margin-bottom: 1vw;'>Hello, ${user.username ? user.username.split(' ')[0] : ''}!</h3>
+                        <h3 style='font-weight: normal;'>We received a request to update your password.<br/><br/>
+                        Click <a style='text-decoration: none;' href='${REACT_APP_URL}/changePass?userEmail=${encrypt(email)}'>here</a> to reset your password.<br/><br/>
+                        If it wasn't you, just ignore this email. You are the only one who has permission to change your password.</h3>
+                        <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
+                        <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
                     </div>`
         }).catch((err) => console.error('Something went wrong!', err))
 
