@@ -208,7 +208,7 @@ router.post('/create', async (req, res, next) => {
         await Log.create({
             username: user && user.username || '',
             email: user && user.email || '',
-            details: `New CV created: ${newResume.username || ''}-${newResume.type || ''}`,
+            details: `New CV created: ${newResume.username || ''} - ${newResume.type || ''}`,
             module: 'CV',
             itemId: newResume._id || null
         })
