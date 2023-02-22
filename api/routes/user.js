@@ -82,7 +82,7 @@ router.post('/login', async (req, res, next) => {
 //Create new user / register
 router.post('/create', verifyToken, async (req, res, next) => {
     try {
-        const { username, email, password, managerEmail, isManager, profilePic, user } = req.body
+        const { username, email, password, sendEmail, profilePic, user } = req.body
 
         const emailRegistered = await User.findOne({ email }).exec()
         if (emailRegistered) return res.status(401).send('Email already in use')
@@ -109,62 +109,33 @@ router.post('/create', verifyToken, async (req, res, next) => {
             itemId: newUser._id || null
         })
 
-        await transporter.sendMail({
-            from: `"Sigma Resume" <${process.env.EMAIL}>`,
-            to: email,
-            subject: `Welcome to Sigma CV App!`,
-            html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
-                        <tbody>
-                            <tr>
-                                <td style='align-items: center; margin: 3vw auto; text-align: center;'>
-                                    <h3 style='font-weight: normal; margin-bottom: 1vw;'>Hello, ${username ? username.split(' ')[0] : ''}!</h3>
-                                    <h3 style='font-weight: normal;'>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
-                                    <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
-                                        <h3 style='font-weight: normal;'>Name: ${username}</h3>
-                                        <h3 style='font-weight: normal;'>Email: ${email}</h3>
-                                        <h3 style='font-weight: normal; color: #cccccc;'>Password: ${password}</h3>
-                                    </div>
-                                    <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
-                                    <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>`
-        }).catch((err) => {
-            console.error('Something went wrong!', err)
-            res.send(500).send('Server Error')
-        })
-
-        // if (managerEmail) {
-        //     await transporter.sendMail({
-        //         from: `"Sigma Resume" <${process.env.EMAIL}>`,
-        //         to: managerEmail,
-        //         subject: `A new user has been created`,
-        //         html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
-        //                     <tbody>
-        //                         <tr>
-        //                             <td style='align-items: center; margin: 3vw auto; text-align: center;'>
-        //                                 <h2>Hello!</h2>
-        //                                 <h3>A new user has been created with you as the manager.</h3>
-        //                                 <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
-        //                                     <h3 style='text-align: center;'>User details</h3>
-        //                                     <h3>Name: ${username}</h3>
-        //                                     <h3>Email: ${email}</h3>
-        //                                     <h3>Password: ${password}</h3>
-        //                                     <h3>Manager: ${managerEmail}</h3>
-        //                                     <h3>Is Manager: ${isManager ? 'Yes' : 'No'}</h3>
-        //                                 </div>
-        //                                 <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
-        //                                 <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px; text-decoration: 'none';'>Sigma CV Maker</h5></a>
-        //                             </td>
-        //                         </tr>
-        //                     </tbody>
-        //                 </table>`
-        //     }).catch((err) => {
-        //         console.error('Something went wrong!', err)
-        //         res.send(500).send('Server Error')
-        //     })
-        // }
+        if (sendEmail) {
+            await transporter.sendMail({
+                from: `"Sigma CV" <${process.env.EMAIL}>`,
+                to: email,
+                subject: `Welcome to Sigma CV App!`,
+                html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
+                            <tbody>
+                                <tr>
+                                    <td style='align-items: center; margin: 3vw auto; text-align: center;'>
+                                        <h3 style='font-weight: normal; margin-bottom: 1vw;'>Hello, ${username ? username.split(' ')[0] : ''}!</h3>
+                                        <h3 style='font-weight: normal;'>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
+                                        <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
+                                            <h3 style='font-weight: normal;'>Name: ${username}</h3>
+                                            <h3 style='font-weight: normal;'>Email: ${email}</h3>
+                                            <h3 style='font-weight: normal; color: #cccccc;'>Password: ${password}</h3>
+                                        </div>
+                                        <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
+                                        <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>`
+            }).catch((err) => {
+                console.error('Something went wrong!', err)
+                res.send(500).send('Server Error')
+            })
+        }
 
         res.status(201).send(`User created successfully`)
     } catch (err) {
@@ -186,7 +157,7 @@ router.post('/update', verifyToken, async (req, res, next) => {
             if (newUser) return res.status(200).json(newUser)
         }
 
-        const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false }).select('-password')
+        const newUser = await User.findByIdAndUpdate(_id, newData, { returnDocument: "after", useFindAndModify: false })
         if (!newUser) return res.status(404).send('Error updating User')
 
         if (profilePic && profilePic.image) {
@@ -211,8 +182,37 @@ router.post('/update', verifyToken, async (req, res, next) => {
             itemId: _id || null
         })
 
+        if (newData.sendEmail) {
+            await transporter.sendMail({
+                from: `"Sigma CV" <${process.env.EMAIL}>`,
+                to: newUser.email,
+                subject: `Your data has been updated`,
+                html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
+                            <tbody>
+                                <tr>
+                                    <td style='align-items: center; margin: 3vw auto; text-align: center;'>
+                                        <h3 style='font-weight: normal; margin-bottom: 1vw;'>Hello, ${newUser.username ? newUser.username.split(' ')[0] : ''}!</h3>
+                                        <h3 style='font-weight: normal;'>Your data has been updated. <br/>These are your credentials to enter the platform:</h3>
+                                        <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
+                                            <h3 style='font-weight: normal;'>Name: ${newUser.username}</h3>
+                                            <h3 style='font-weight: normal;'>Email: ${newUser.email}</h3>
+                                            <h3 style='font-weight: normal; color: #cccccc;'>Password: ${newUser.password}</h3>
+                                        </div>
+                                        <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
+                                        <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>`
+            }).catch((err) => {
+                console.error('Something went wrong!', err)
+                res.send(500).send('Server Error')
+            })
+        }
+
         const token = jwt.sign({ sub: newUser._id }, JWT_SECRET, { expiresIn: '30d' })
 
+        delete newUser.password
         res.status(200).json({ ...newUser._doc, token })
     } catch (err) {
         console.error('Something went wrong!', err)
