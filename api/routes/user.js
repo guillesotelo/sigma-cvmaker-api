@@ -241,7 +241,7 @@ router.get('/getAll', verifyToken, async (req, res, next) => {
 //Get all managers
 router.get('/getManagers', verifyToken, async (req, res, next) => {
     try {
-        const managers = await User.find({ isManager: true }).select('-password').sort({ username: 1 })
+        const managers = await User.find({ isManager: true, username: { $ne: 'Admin ' } }).select('-password').sort({ username: 1 })
         if (!managers) return res.status(200).send('No managers found')
 
         res.status(200).json(managers)
