@@ -42,7 +42,7 @@ router.post('/publish', async (req, res, next) => {
     try {
         const { _id, publicTime } = req.body
         const publicData = {
-            publicTime: publicTime || 0,
+            publicTime: publicTime || publicTime === 0 ? publicTime : 30,
             published: new Date()
         }
 
