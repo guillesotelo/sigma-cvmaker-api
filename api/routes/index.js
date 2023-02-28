@@ -8,6 +8,7 @@ const reportRoutes = require('./report')
 const logRoutes = require('./log')
 const appDataRoutes = require('./appData')
 const imageRoutes = require('./image')
+const publicRoutes = require('./public')
 const { verifyToken } = require('../helpers')
 dotenv.config()
 
@@ -17,5 +18,6 @@ router.use('/report', verifyToken, reportRoutes)
 router.use('/log', verifyToken, logRoutes)
 router.use('/app', verifyToken, appDataRoutes)
 router.use('/image', verifyToken, imageRoutes)
+router.use('/public', publicRoutes)
 
 module.exports = router, verifyToken

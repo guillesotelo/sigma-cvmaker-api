@@ -37,6 +37,26 @@ router.get('/myResume', async (req, res, next) => {
     }
 })
 
+//Publish resume
+router.post('/publish', async (req, res, next) => {
+    try {
+        const { _id, publicTime } = req.body
+        const publicData = {
+            publicTime: publicTime || 0,
+            published: new Date()
+        }
+
+        const resume = await Resume.findByIdAndUpdate(_id, publicData, { returnDocument: "after", useFindAndModify: false })
+        if (!resume) return res.status(401).json({ message: 'Error updating CV' })
+
+
+        res.status(200).json(resume)
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
 //Get CV Logo
 router.get('/getCVLogo', async (req, res, next) => {
     try {

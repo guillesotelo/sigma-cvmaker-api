@@ -38,6 +38,13 @@ const resumeSchema = new mongoose.Schema({
     removed: {
         type: Boolean,
         default: false
+    },
+    published: {
+        type: Date,
+        default: false
+    },
+    publicTime: {
+        type: Number
     }
 }, { timestamps: true })
 
