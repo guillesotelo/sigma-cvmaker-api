@@ -40,7 +40,7 @@ router.get('/myResume', async (req, res, next) => {
 //Publish resume
 router.post('/publish', async (req, res, next) => {
     try {
-        const { _id, publicTime } = req.body
+        const { _id, publicTime, user } = req.body
         const publicData = {
             publicTime: publicTime || publicTime === 0 ? publicTime : 30,
             published: new Date()
@@ -49,6 +49,13 @@ router.post('/publish', async (req, res, next) => {
         const resume = await Resume.findByIdAndUpdate(_id, publicData, { returnDocument: "after", useFindAndModify: false })
         if (!resume) return res.status(401).json({ message: 'Error updating CV' })
 
+        await Log.create({
+            username: user.username || '',
+            email: user.email || '',
+            details: `CV published: ${resume.username} - ${resume.role} (${publicTime} days)`,
+            module: 'CV',
+            itemId: resume._id || null
+        })
 
         res.status(200).json(resume)
     } catch (err) {
@@ -228,7 +235,7 @@ router.post('/create', async (req, res, next) => {
         await Log.create({
             username: user && user.username || '',
             email: user && user.email || '',
-            details: `New CV created: ${newResume.username || ''} - ${newResume.type || ''}`,
+            details: `New CV created: ${newResume.username || ''} - ${newResume.role || ''}`,
             module: 'CV',
             itemId: newResume._id || null
         })
@@ -372,7 +379,7 @@ router.post('/update', async (req, res, next) => {
         await Log.create({
             username: user && user.username || '',
             email: user && user.email || '',
-            details: `CV updated: ${updated.username || ''} - ${updated.type || ''}`,
+            details: `CV updated: ${updated.username || ''} - ${updated.role || ''}`,
             module: 'CV',
             itemId: _id || null
         })
