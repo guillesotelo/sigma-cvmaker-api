@@ -1,9 +1,9 @@
 const express = require('express')
 const router = express.Router()
-const { Resume, Image, Log } = require('../db/models')
+const { Resume, Image, Log, ResumePDF } = require('../db/models')
 const transporter = require('../helpers/mailer')
 const { REACT_APP_URL } = process.env
-const { encrypt, decrypt } = require('../helpers')
+const { encrypt, decrypt, calculateStringSize } = require('../helpers')
 
 //Get all resumes by Manager
 router.get('/getAll', async (req, res, next) => {
@@ -12,11 +12,13 @@ router.get('/getAll', async (req, res, next) => {
         let resumes = null
 
         if (getAll) resumes = await Resume.find({ removed: false }).sort([['updatedAt', 'descending']])
-        else if (managerEmail) resumes = await Resume.find({ managerEmail }).select('-data').sort([['updatedAt', 'descending']])
+        else if (managerEmail) resumes = await Resume.find({ managerEmail }).sort([['updatedAt', 'descending']])
+
+        const pdfResumes = await ResumePDF.find({ removed: false }).select('-pdf').sort([['updatedAt', 'descending']])
 
         if (!resumes) return res.status(200).json([])
 
-        res.status(200).json(resumes)
+        res.status(200).json(resumes.concat(pdfResumes))
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')
@@ -141,17 +143,23 @@ router.post('/create', async (req, res, next) => {
         const {
             email,
             username,
-            managerEmail,
             profilePic,
             clientLogos,
             clients,
             user,
             signatureCanvas,
-            type
+            type,
+            data,
+            pdfData
         } = { ...req.body }
-        const newResume = await Resume.create(req.body)
 
-        if (!newResume) return res.status(400).json('Error creating CV')
+        req.body.size = calculateStringSize(pdfData?.pdf || data)
+
+        let newResume = {}
+        if (pdfData) newResume = await ResumePDF.create(req.body)
+        else newResume = await Resume.create(req.body)
+
+        if (!newResume?._id) return res.status(400).json('Error creating CV')
 
         const profile = await Image.findOne({ email, type: 'Profile' }).exec()
         const signature = await Image.findOne({ email, type: 'Signature' }).exec()
@@ -240,34 +248,6 @@ router.post('/create', async (req, res, next) => {
             itemId: newResume._id || null
         })
 
-        //Removed for now
-        // if (managerEmail && username) {
-        //     await transporter.sendMail({
-        //         from: `"Sigma Resume" <${process.env.EMAIL}>`,
-        //         to: managerEmail,
-        //         subject: `A new CV has been created`,
-        //         html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
-        //                 <tbody>
-        //                     <tr>
-        //                         <td style='align-items: center; margin: 3vw auto; text-align: center;'>
-        //                             <h2>Hello, ${username.split(' ')[0]}!</h2>
-        //                             <h3>A new CV has been created and added to the platform.</h3>
-        //                             <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
-        //                                 <h3>Name: ${username}</h3>
-        //                                 <h3>Email: ${email}</h3>
-        //                             </div>
-        //                             <img src="https://assets.website-files.com/575cac2e09a5a7a9116b80ed/59df61509e79bf0001071c25_Sigma.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
-        //                             <a href='${REACT_APP_URL}/login'><h5 style='margin: 4px; text-decoration: 'none';'>Sigma CV Maker</h5></a>
-        //                         </td>
-        //                     </tr>
-        //                 </tbody>
-        //             </table>`
-        //     }).catch((err) => {
-        //         console.error('Something went wrong!', err)
-        //         res.send(500).send('Server Error')
-        //     })
-        // }
-
         res.status(200).json({ newResume })
     } catch (err) {
         console.error('Something went wrong!', err)
@@ -286,11 +266,18 @@ router.post('/update', async (req, res, next) => {
             signatureCanvas,
             clientLogos,
             clients,
-            user
+            user,
+            data,
+            pdfData
         } = req.body
 
-        const updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
-        if (!updated) return res.status(404).send('Error updating CV')
+        req.body.size = calculateStringSize(pdfData || data)
+
+        let updated = {}
+        if (pdfData) updated = await ResumePDF.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
+        else updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
+
+        if (!updated?._id) return res.status(404).send('Error updating CV')
 
         if (updated) {
             if (profilePic && profilePic.image) {

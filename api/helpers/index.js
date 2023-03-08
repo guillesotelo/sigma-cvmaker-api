@@ -31,8 +31,13 @@ const verifyToken = (req, res, next) => {
     } else res.sendStatus(403)
 }
 
+const calculateStringSize = data => {
+    return new TextEncoder().encode(data || ' ').length || 0
+}
+
 module.exports = {
     encrypt,
     decrypt,
-    verifyToken
+    verifyToken,
+    calculateStringSize
 }

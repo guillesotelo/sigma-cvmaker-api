@@ -2,7 +2,13 @@ const dotenv = require('dotenv')
 const express = require('express')
 const router = express.Router()
 const { User, Image, Log } = require('../db/models')
-const transporter = require('../helpers/mailer')
+const {
+    transporter,
+    sendWelcomeEmail,
+    sendDataUpdateEmail,
+    sendPasswordResetEmail,
+    sendPasswordUpdateEmail
+} = require('../helpers/mailer')
 const { encrypt, decrypt } = require('../helpers')
 const { REACT_APP_URL } = process.env
 const jwt = require('jsonwebtoken')
@@ -109,33 +115,7 @@ router.post('/create', verifyToken, async (req, res, next) => {
             itemId: newUser._id || null
         })
 
-        if (sendEmail) {
-            await transporter.sendMail({
-                from: `"Sigma CV" <${process.env.EMAIL}>`,
-                to: email,
-                subject: `Welcome to Sigma CV App!`,
-                html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
-                            <tbody>
-                                <tr>
-                                    <td style='align-items: center; margin: 3vw auto; text-align: center;'>
-                                        <h3 style='font-weight: normal; margin-bottom: 1vw;'>Hello, ${username ? username.split(' ')[0] : ''}!</h3>
-                                        <h3 style='font-weight: normal;'>Welcome to Sigma CV Maker. <br/>These are your credentials to enter the platform:</h3>
-                                        <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
-                                            <h3 style='font-weight: normal;'>Name: ${username}</h3>
-                                            <h3 style='font-weight: normal;'>Email: ${email}</h3>
-                                            <h3 style='font-weight: normal; color: #cccccc;'>Password: ${password}</h3>
-                                        </div>
-                                        <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
-                                        <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>`
-            }).catch((err) => {
-                console.error('Something went wrong!', err)
-                res.send(500).send('Server Error')
-            })
-        }
+        if (sendEmail) sendWelcomeEmail(username, password, email)
 
         res.status(201).send(`User created successfully`)
     } catch (err) {
@@ -182,33 +162,7 @@ router.post('/update', verifyToken, async (req, res, next) => {
             itemId: _id || null
         })
 
-        if (newData.sendEmail) {
-            await transporter.sendMail({
-                from: `"Sigma CV" <${process.env.EMAIL}>`,
-                to: newUser.email,
-                subject: `Your data has been updated`,
-                html: `<table style='margin: auto; color: rgb(51, 51, 51);'>
-                            <tbody>
-                                <tr>
-                                    <td style='align-items: center; margin: 3vw auto; text-align: center;'>
-                                        <h3 style='font-weight: normal; margin-bottom: 1vw;'>Hello, ${newUser.username ? newUser.username.split(' ')[0] : ''}!</h3>
-                                        <h3 style='font-weight: normal;'>Your data has been updated. <br/>These are your credentials to enter the platform:</h3>
-                                        <div style='margin: 3vw auto; padding: 1vw 1.5vw; text-align:left; border: 1px solid lightgray; border-radius:8px;box-shadow: 2px 2px 15px lightgray;'>
-                                            <h3 style='font-weight: normal;'>Name: ${newUser.username}</h3>
-                                            <h3 style='font-weight: normal;'>Email: ${newUser.email}</h3>
-                                            <h3 style='font-weight: normal; color: #cccccc;'>Password: ${newUser.password}</h3>
-                                        </div>
-                                        <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='width: 120px; margin-top: 3vw; align-self: center;' alt="sigma-logo" border="0"/>
-                                        <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>`
-            }).catch((err) => {
-                console.error('Something went wrong!', err)
-                res.send(500).send('Server Error')
-            })
-        }
+        if (newData.sendEmail) sendDataUpdateEmail(newUser.username, newUser.password, newUser.email)
 
         const token = jwt.sign({ sub: newUser._id }, JWT_SECRET, { expiresIn: '30d' })
 
@@ -302,18 +256,7 @@ router.post('/changePass', async (req, res, next) => {
             itemId: updatedUser._id || null
         })
 
-        await transporter.sendMail({
-            from: `"Sigma CV App" <${process.env.EMAIL}>`,
-            to: email,
-            subject: 'Your password has been changed',
-            html: `<div style='margin-top: 3vw; text-align: center;'>
-                        <h3 style='text-align: left; font-weight: normal; margin-bottom: 1vw;'>Hello, ${userData.username ? userData.username.split(' ')[0] : ''}!</h3>
-                        <h3 style='font-weight: normal;'>Your password has been changed.</h3>
-                        <h3 style='font-weight: normal;'>If it was a mistake, use <a style='text-decoration: none;' href='${REACT_APP_URL}/changePass?userEmail=${encrypt(userEmail)}'>this link</a> to generate a new one.</h3>
-                        <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
-                        <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
-                    </div>`
-        }).catch((err) => console.error('Something went wrong!', err))
+        sendPasswordUpdateEmail(userData.username, userEmail, email)
 
         res.status(200).json({ messsage: 'Password updated successfully' })
 
@@ -338,19 +281,7 @@ router.post('/resetByEmail', async (req, res, next) => {
             itemId: user._id || null
         })
 
-        await transporter.sendMail({
-            from: `"Sigma CV App" <${process.env.EMAIL}>`,
-            to: email,
-            subject: 'Password Reset',
-            html: `<div style='margin-top: 3vw; text-align: center;'>
-                        <h3 style='text-align: left; font-weight: normal; margin-bottom: 1vw;'>Hello, ${user.username ? user.username.split(' ')[0] : ''}!</h3>
-                        <h3 style='font-weight: normal;'>We received a request to update your password.<br/><br/>
-                        Click <a style='text-decoration: none;' href='${REACT_APP_URL}/changePass?userEmail=${encrypt(email)}'>here</a> to reset your password.<br/><br/>
-                        If it wasn't you, just ignore this email. You are the only one who has permission to change your password.</h3>
-                        <img src="https://sigmait.pl/wp-content/uploads/2021/12/sigma-logo-black.png" style='height: 30px; width: auto; margin-top: 4vw;' alt="sigma-logo" border="0">
-                        <h5 style='margin: 4px;'><a style='text-decoration: none;' href='${REACT_APP_URL}'>Sigma CV App<a/></h5>
-                    </div>`
-        }).catch((err) => console.error('Something went wrong!', err))
+        sendPasswordResetEmail(user.username, encrypt(email), email)
 
         res.status(200).json({})
     } catch (err) {

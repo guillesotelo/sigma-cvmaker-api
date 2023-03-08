@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const resumeSchema = new mongoose.Schema({
+const resumePdfSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: new Date()
@@ -46,11 +46,17 @@ const resumeSchema = new mongoose.Schema({
     publicTime: {
         type: Number
     },
+    filename: {
+        type: String
+    },
+    pdf: {
+        type: String
+    },
     size: {
         type: String
     }
 }, { timestamps: true })
 
-const Resume = mongoose.model('Resume', resumeSchema)
+const ResumePDF = mongoose.model('ResumePDF', resumePdfSchema)
 
-module.exports = Resume
+module.exports = ResumePDF
