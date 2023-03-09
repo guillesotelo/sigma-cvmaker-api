@@ -153,10 +153,10 @@ router.post('/create', async (req, res, next) => {
             pdfData
         } = { ...req.body }
 
-        req.body.size = calculateStringSize(pdfData?.pdf || data)
+        req.body.size = pdfData?.size ? pdfData.size : calculateStringSize(data)
 
         let newResume = {}
-        if (pdfData) newResume = await ResumePDF.create(req.body)
+        if (pdfData?.pdf) newResume = await ResumePDF.create({ ...req.body, ...pdfData })
         else newResume = await Resume.create(req.body)
 
         if (!newResume?._id) return res.status(400).json('Error creating CV')
@@ -271,10 +271,10 @@ router.post('/update', async (req, res, next) => {
             pdfData
         } = req.body
 
-        req.body.size = calculateStringSize(pdfData || data)
+        req.body.size = pdfData?.size ? pdfData.size : calculateStringSize(data)
 
         let updated = {}
-        if (pdfData) updated = await ResumePDF.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
+        if (pdfData?.pdf) updated = await ResumePDF.findByIdAndUpdate(_id, { ...req.body, ...pdfData }, { useFindAndModify: false })
         else updated = await Resume.findByIdAndUpdate(_id, req.body, { useFindAndModify: false })
 
         if (!updated?._id) return res.status(404).send('Error updating CV')

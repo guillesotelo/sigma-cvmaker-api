@@ -40,14 +40,14 @@ const resumeSchema = new mongoose.Schema({
         default: false
     },
     published: {
-        type: Date,
-        default: false
+        type: Date
     },
     publicTime: {
         type: Number
     },
     size: {
-        type: String
+        type: Number,
+        default: 0
     }
 }, { timestamps: true })
 

@@ -278,8 +278,8 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
         
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
 <div align="left">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="http://bit.ly/3ZuU58N" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
-    <a href="http://bit.ly/3ZuU58N" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
+  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
+    <a href="https://tinyurl.com/2p8zwuzr" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
       <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Login</span></span>
     </a>
   <!--[if mso]></center></v:roundrect><![endif]-->
@@ -689,8 +689,8 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
         
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
 <div align="left">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="http://bit.ly/3ZuU58N" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
-    <a href="http://bit.ly/3ZuU58N" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
+  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
+    <a href="https://tinyurl.com/2p8zwuzr" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
       <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Login</span></span>
     </a>
   <!--[if mso]></center></v:roundrect><![endif]-->
@@ -1098,8 +1098,8 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
         
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
 <div align="left">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="http://bit.ly/3ZuU58N" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
-    <a href="http://bit.ly/3ZuU58N" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
+  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
+    <a href="https://tinyurl.com/2p8zwuzr" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
       <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Login</span></span>
     </a>
   <!--[if mso]></center></v:roundrect><![endif]-->
