@@ -22,7 +22,7 @@ router.post('/login', async (req, res, next) => {
         const { email, password } = req.body
 
         const user = await User.findOne({ email }).exec()
-        if (!user) return res.status(401).json({ message: 'Email not found' })
+        if (!user || user.removed) return res.status(401).json({ message: 'User not found' })
 
         const compareRes = await user.comparePassword(password)
         if (!compareRes) {
@@ -130,7 +130,7 @@ router.post('/update', verifyToken, async (req, res, next) => {
         const { _id, newData, profilePic, user, managerUpdate, email } = req.body
 
         const _user = await User.findOne({ email: user.email }).exec()
-        if (!_user || !_user.isManager) return res.status(405).json({ message: 'User does not have the required permission' })
+        if (!_user || (!_user.isManager && !_user.isAdmin)) return res.status(405).json({ message: 'User does not have the required permission' })
 
         if (managerUpdate && email) {
             const newUser = await User.findOneAndUpdate({ email }, newData, { returnDocument: "after", useFindAndModify: false }).select('-password')
@@ -180,7 +180,7 @@ router.get('/getAll', verifyToken, async (req, res, next) => {
         const { email } = req.query
         const user = await User.findOne({ email }).exec()
 
-        if (user && user.isManager) {
+        if (user && (user.isManager || user.isAdmin)) {
             const users = await User.find().select('-password').sort({ username: 1 })
             if (!users) return res.status(200).send('No users found')
 
@@ -296,7 +296,7 @@ router.get('/permissions', async (req, res, next) => {
         const { email } = req.query
 
         const user = await User.findOne({ email }).exec()
-        if (!user) return res.status(401).send('Email not found')
+        if (!user || user.removed) return res.status(401).send('User not found')
 
         res.status(200).json({
             isAdmin: user.isAdmin || false,
@@ -317,7 +317,7 @@ router.post('/remove', verifyToken, async (req, res, next) => {
         const user = await User.findOne({ email }).exec()
         if (!user) return res.status(401).send('User not found')
 
-        if (user.isManager) {
+        if (user && (user.isManager || user.isAdmin)) {
             const removed = await User.findOneAndUpdate(
                 { email: userData.email },
                 { removed: true },

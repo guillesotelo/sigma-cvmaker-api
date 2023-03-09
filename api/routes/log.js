@@ -8,7 +8,7 @@ router.get('/getAll', async (req, res, next) => {
         const { email } = req.query
         const user = await User.findOne({ email }).exec()
 
-        if (!user || user.isManager) {
+        if (user && (user.isManager || user.isAdmin)) {
             const logs = await Log.find().sort([['updatedAt', 'descending']])
             if (!logs) return res.status(200).send('No logs found.')
 

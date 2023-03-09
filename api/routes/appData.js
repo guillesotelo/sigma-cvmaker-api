@@ -8,7 +8,7 @@ router.get('/getAll', async (req, res, next) => {
         const { email } = req.query
         const user = await User.findOne({ email }).exec()
 
-        if (user && user.isManager) {
+        if (user && (user.isManager || user.isAdmin)) {
             const appData = await AppData.find().sort([['updatedAt', 'descending']])
             if (!appData) return res.status(304).send('No App Data found.')
 
@@ -110,7 +110,7 @@ router.get('/getRemovedItems', async (req, res, next) => {
         const { email } = req.query
         const user = await User.findOne({ email }).exec()
 
-        if (user && user.isManager) {
+        if (user && (user.isManager || user.isAdmin)) {
 
             const removedItems = {
                 images: await Image.find({ removed: true }).sort([['updatedAt', 'descending']]),
@@ -134,7 +134,7 @@ router.get('/restoreItem', async (req, res, next) => {
         const { email, _id, item } = req.query
         const user = await User.findOne({ email }).exec()
 
-        if (user && user.isManager && item) {
+        if (user && (user.isManager || user.isAdmin) && item) {
             const module = item === `CV's` ? 'CV' : item === `Images` ? 'Image' : item === `Users` ? 'User' : '' 
             let restored = null
 
@@ -166,7 +166,7 @@ router.get('/removeItem', async (req, res, next) => {
         const { email, _id, item } = req.query
         const user = await User.findOne({ email }).exec()
 
-        if (user && user.isManager && item) {
+        if (user && (user.isManager || user.isAdmin) && item) {
             const module = item === `CV's` ? 'CV' : item === `Images` ? 'Image' : item === `Users` ? 'User' : '' 
             let removed = null
 

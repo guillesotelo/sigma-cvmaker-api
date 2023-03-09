@@ -1105,8 +1105,8 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
   <!--[if mso]></center></v:roundrect><![endif]-->
 </div>
 
-<div style="font-size: 14px; line-height: 140%; text-align: left; word-wrap: break-word; margin-top: 20px">
-<p style="font-size: 14px; line-height: 140%;"><span style="color: #fff; font-size: 14px; line-height: 19.6px;"><span style="line-height: 19.6px;">If it wasn't you or you made a mistake, you can re-generate it </span></span></p>
+<div style="font-size: 14px; line-height: 140%; text-align: left; word-wrap: break-word; margin: 30px 0 10px 0;">
+<p style="font-size: 14px; line-height: 140%;"><span style="color: #888888; font-size: 14px; line-height: 19.6px;"><span style="line-height: 19.6px;">If it wasn't you or you made a mistake, you can re-generate it </span></span></p>
 </div>
 <div align="left">
   <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr/changePass?userEmail=${encryptedEmail}" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
