@@ -674,7 +674,7 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
 <p style="font-size: 14px; line-height: 140%;"><span style="font-size: 18px; line-height: 25.2px; color: #666666;">These are your updated credentials to enter the platform:</span></p>
 <p style="font-size: 14px; line-height: 140%;"> </p>
 <p style="line-height: 140%;"><span style="color: #666666; line-height: 19.6px;"><span style="font-size: 18px; line-height: 25.2px;"><strong>username:</strong> ${username}</span></span></p>
-<p style="line-height: 140%;"><span style="color: #666666; line-height: 19.6px;"><span style="font-size: 18px; line-height: 25.2px;"><strong>password:</strong> ${password}</span></span></p>
+<p style="line-height: 140%;"><span style="color: #666666; line-height: 19.6px;"><span style="font-size: 18px; line-height: 25.2px;"><strong>password:</strong> ${password || '[not updated]'}</span></span></p>
   </div>
 
       </td>

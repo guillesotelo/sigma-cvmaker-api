@@ -162,7 +162,7 @@ router.post('/update', verifyToken, async (req, res, next) => {
             itemId: _id || null
         })
 
-        if (newData.sendEmail) sendDataUpdateEmail(newUser.username, newUser.password, newUser.email)
+        if (newData.sendEmail) sendDataUpdateEmail(newUser.username, newData.password, newUser.email)
 
         const token = jwt.sign({ sub: newUser._id }, JWT_SECRET, { expiresIn: '30d' })
 

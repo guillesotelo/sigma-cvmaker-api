@@ -42,13 +42,15 @@ router.get('/myResume', async (req, res, next) => {
 //Publish resume
 router.post('/publish', async (req, res, next) => {
     try {
-        const { _id, publicTime, user } = req.body
+        const { _id, publicTime, user, isPdf } = req.body
         const publicData = {
             publicTime: publicTime || publicTime === 0 ? publicTime : 30,
             published: new Date()
         }
 
-        const resume = await Resume.findByIdAndUpdate(_id, publicData, { returnDocument: "after", useFindAndModify: false })
+        let resume = null
+        if (isPdf) resume = await ResumePDF.findByIdAndUpdate(_id, publicData, { returnDocument: "after", useFindAndModify: false }).select('-pdf')
+        else resume = await Resume.findByIdAndUpdate(_id, publicData, { returnDocument: "after", useFindAndModify: false })
         if (!resume) return res.status(401).json({ message: 'Error updating CV' })
 
         await Log.create({
@@ -117,6 +119,20 @@ router.get('/getById', async (req, res, next) => {
         if (!resume) return res.status(401).json({ message: 'Resume not found' })
 
         res.status(200).json(resume)
+    } catch (err) {
+        console.error('Something went wrong!', err)
+        res.send(500).send('Server Error')
+    }
+})
+
+//Get Resume PDF data by ID
+router.get('/getPdfById', async (req, res, next) => {
+    try {
+        const { _id } = req.query
+        const resumePdf = await ResumePDF.findOne({ _id }).exec()
+        if (!resumePdf) return res.status(401).json({ message: 'Resume not found' })
+
+        res.status(200).json(resumePdf)
     } catch (err) {
         console.error('Something went wrong!', err)
         res.send(500).send('Server Error')
