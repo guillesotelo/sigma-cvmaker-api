@@ -181,7 +181,7 @@ router.get('/getAll', verifyToken, async (req, res, next) => {
         const user = await User.findOne({ email }).exec()
 
         if (user && (user.isManager || user.isAdmin)) {
-            const users = await User.find().select('-password').sort({ username: 1 })
+            const users = await User.find({ removed: false }).select('-password').sort({ username: 1 })
             if (!users) return res.status(200).send('No users found')
 
             res.status(200).json(users)
