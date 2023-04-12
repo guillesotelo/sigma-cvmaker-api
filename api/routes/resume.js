@@ -397,14 +397,15 @@ router.post('/update', async (req, res, next) => {
 //Remove Mocement by ID
 router.post('/remove', async (req, res, next) => {
     try {
-        const { _id, user, email } = req.body
-        const exists = await Resume.findOne({ _id }).exec()
+        const { _id, user, email, isPdf } = req.body
+        const exists = isPdf ? await ResumePDF.findOne({ _id }).exec() : await Resume.findOne({ _id }).exec()
         if (!exists) return res.status(404).send('Error deleting CV')
 
-        const removed = await Resume.findByIdAndUpdate(_id, { removed: true }, { useFindAndModify: false })
+        const removed = isPdf ? await ResumePDF.findByIdAndUpdate(_id, { removed: true }, { useFindAndModify: false })
+        : await Resume.findByIdAndUpdate(_id, { removed: true }, { useFindAndModify: false })
         let variants = null
 
-        if (exists.type === 'Master') {
+        if (exists.type && exists.type === 'Master') {
             const image = await Image.findOneAndUpdate(
                 { email: exists.email, type: 'Signature' },
                 { removed: true },
@@ -430,7 +431,7 @@ router.post('/remove', async (req, res, next) => {
             username: user.username || '',
             email: user.email || '',
             details: variants && variants.length ? `CV moved to trash along with ${variants.length} variants: ${exists.username}`
-                : `CV moved to trash: ${exists.username}`,
+                : `CV${isPdf ? ' PDF ' : ' '}moved to trash: ${exists.username}`,
             module: 'CV',
             itemId: _id || null
         })

@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { AppData, Log, User, Image, Resume } = require('../db/models')
+const { AppData, Log, User, Image, Resume, ResumePDF } = require('../db/models')
 
 //Get all App Data
 router.get('/getAll', async (req, res, next) => {
@@ -111,12 +111,15 @@ router.get('/getRemovedItems', async (req, res, next) => {
         const user = await User.findOne({ email }).exec()
 
         if (user && (user.isManager || user.isAdmin)) {
-
+            const pdfCVs = await ResumePDF.find({ removed: true }).select('-pdf').sort([['updatedAt', 'descending']])
+            
             const removedItems = {
                 images: await Image.find({ removed: true }).sort([['updatedAt', 'descending']]),
                 resumes: await Resume.find({ removed: true }).sort([['updatedAt', 'descending']]),
-                users: await User.find({ removed: true }).select('-password').sort([['updatedAt', 'descending']]),
+                users: await User.find({ removed: true }).select('-password').sort([['updatedAt', 'descending']])
             }
+
+            if(pdfCVs && pdfCVs.length) removedItems.resumes = removedItems.resumes.concat(pdfCVs)
 
             if (!Object.keys(removedItems).length) return res.status(304).send('No removed items found.')
 
@@ -131,14 +134,15 @@ router.get('/getRemovedItems', async (req, res, next) => {
 //Restore Item
 router.get('/restoreItem', async (req, res, next) => {
     try {
-        const { email, _id, item } = req.query
+        const { email, _id, item, isPdf } = req.query
         const user = await User.findOne({ email }).exec()
 
         if (user && (user.isManager || user.isAdmin) && item) {
             const module = item === `CV's` ? 'CV' : item === `Images` ? 'Image' : item === `Users` ? 'User' : '' 
             let restored = null
 
-            if (item === `CV's`) restored = await Resume.findByIdAndUpdate(_id, { removed: false }, { returnDocument: "after", useFindAndModify: false })
+            if (item === `CV's`) restored = isPdf ? await ResumePDF.findByIdAndUpdate(_id, { removed: false }, { returnDocument: "after", useFindAndModify: false })
+            : await Resume.findByIdAndUpdate(_id, { removed: false }, { returnDocument: "after", useFindAndModify: false })
             else if (item === `Images`) restored = await Image.findByIdAndUpdate(_id, { removed: false }, { returnDocument: "after", useFindAndModify: false })
             else if (item === `Users`) restored = await User.findByIdAndUpdate(_id, { removed: false }, { returnDocument: "after", useFindAndModify: false })
 
@@ -163,14 +167,14 @@ router.get('/restoreItem', async (req, res, next) => {
 //Remove Item permanently
 router.get('/removeItem', async (req, res, next) => {
     try {
-        const { email, _id, item } = req.query
+        const { email, _id, item, isPdf } = req.query
         const user = await User.findOne({ email }).exec()
 
         if (user && (user.isManager || user.isAdmin) && item) {
             const module = item === `CV's` ? 'CV' : item === `Images` ? 'Image' : item === `Users` ? 'User' : '' 
             let removed = null
 
-            if (item === `CV's`) removed = await Resume.deleteOne({ _id })
+            if (item === `CV's`) removed = isPdf ? await ResumePDF.deleteOne({ _id }) : await Resume.deleteOne({ _id })
             else if (item === `Images`) removed = await Image.deleteOne({ _id })
             else if (item === `Users`) removed = await User.deleteOne({ _id })
 
