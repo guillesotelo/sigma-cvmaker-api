@@ -1,3 +1,31 @@
+// LOGIN BUTTON DIV
+{/* <div align="left">
+  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
+    <a href="https://tinyurl.com/2p8zwuzr" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
+      <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Login</span></span>
+    </a>
+  <!--[if mso]></center></v:roundrect><![endif]-->
+</div> */}
+
+
+// PASSWORD REGENERATE DIV
+{/* <p style="font-size: 14px; line-height: 140%;"><span style="color: #888888; font-size: 14px; line-height: 19.6px;"><span style="line-height: 19.6px;">If it wasn't you or you made a mistake, you can re-generate it </span></span></p>
+</div>
+<div align="left">
+    <a href="https://tinyurl.com/2p8zwuzr/changePass?userEmail=${encryptedEmail}" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
+      <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Regenerate password</span></span>
+    </a>
+</div> */}
+
+// UPDATE PASSWORD DIV
+{/* <div align="left">
+  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr/changePass?userEmail=${encryptedEmail}" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
+    <a href="https://tinyurl.com/2p8zwuzr/changePass?userEmail=${encryptedEmail}" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
+      <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Update password</span></span>
+    </a>
+  <!--[if mso]></center></v:roundrect><![endif]-->
+</div> */}
+
 const welcomeEmail = (fullName, username, password) => `
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -277,13 +305,8 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 40px;font-family:'Lato',sans-serif;" align="left">
         
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
-<div align="left">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
-    <a href="https://tinyurl.com/2p8zwuzr" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
-      <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Login</span></span>
-    </a>
-  <!--[if mso]></center></v:roundrect><![endif]-->
-</div>
+
+  <!--LOGIN BUTTON DIV-->
 
       </td>
     </tr>
@@ -688,13 +711,8 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 40px;font-family:'Lato',sans-serif;" align="left">
         
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
-<div align="left">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
-    <a href="https://tinyurl.com/2p8zwuzr" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
-      <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Login</span></span>
-    </a>
-  <!--[if mso]></center></v:roundrect><![endif]-->
-</div>
+
+  <!--LOGIN BUTTON DIV-->
 
       </td>
     </tr>
@@ -1097,24 +1115,12 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
       <td style="overflow-wrap:break-word;word-break:break-word;padding:0px 40px;font-family:'Lato',sans-serif;" align="left">
         
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
-<div align="left">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
-    <a href="https://tinyurl.com/2p8zwuzr" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
-      <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Login</span></span>
-    </a>
-  <!--[if mso]></center></v:roundrect><![endif]-->
-</div>
+
+  <!--LOGIN BUTTON DIV-->
 
 <div style="font-size: 14px; line-height: 140%; text-align: left; word-wrap: break-word; margin: 30px 0 10px 0;">
-<p style="font-size: 14px; line-height: 140%;"><span style="color: #888888; font-size: 14px; line-height: 19.6px;"><span style="line-height: 19.6px;">If it wasn't you or you made a mistake, you can re-generate it </span></span></p>
-</div>
-<div align="left">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr/changePass?userEmail=${encryptedEmail}" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
-    <a href="https://tinyurl.com/2p8zwuzr/changePass?userEmail=${encryptedEmail}" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
-      <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Regenerate password</span></span>
-    </a>
-  <!--[if mso]></center></v:roundrect><![endif]-->
-</div>
+
+  <!--PASSWORD REGENERATE DIV-->
 
       </td>
     </tr>
@@ -1518,13 +1524,7 @@ table, td { color: #000000; } #u_body a { color: #161a39; text-decoration: under
         
   <!--[if mso]><style>.v-button {background: transparent !important;}</style><![endif]-->
 
-<div align="left">
-  <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="https://tinyurl.com/2p8zwuzr/changePass?userEmail=${encryptedEmail}" style="height:47px; v-text-anchor:middle; width:113px;" arcsize="2%"  stroke="f" fillcolor="#061e34"><w:anchorlock/><center style="color:#ffffff;font-family:'Lato',sans-serif;"><![endif]-->  
-    <a href="https://tinyurl.com/2p8zwuzr/changePass?userEmail=${encryptedEmail}" target="_blank" class="v-button" style="box-sizing: border-box;display: inline-block;font-family:'Lato',sans-serif;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color: #ffffff; background-color: #061e34; border-radius: 1px;-webkit-border-radius: 1px; -moz-border-radius: 1px; width:auto; max-width:100%; overflow-wrap: break-word; word-break: break-word; word-wrap:break-word; mso-border-alt: none;font-size: 14px;">
-      <span style="display:block;padding:15px 40px;line-height:120%;"><span style="line-height: 16.8px;">Update password</span></span>
-    </a>
-  <!--[if mso]></center></v:roundrect><![endif]-->
-</div>
+  <!--UPDATE PASSWORD DIV-->
 
       </td>
     </tr>
