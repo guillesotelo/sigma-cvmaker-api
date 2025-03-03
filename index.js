@@ -6,10 +6,8 @@ const routes = require("./api/routes")
 const app = express()
 
 app.use(cors({
-  origin: 'https://sigma-cvmaker.vercel.app',
-  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
+  origin: '*',
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH']
 }))
 app.use(morgan("dev"))
 
